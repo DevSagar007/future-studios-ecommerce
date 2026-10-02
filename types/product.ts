@@ -1,0 +1,2 @@
+export type Product = { id:string; name:string; slug:string; price:number; originalPrice:number; category:string; rating:number; stock:number; image:string; description:string; reviews:{id:string;author:string;rating:number;comment:string}[] };
+export type ProductQuery = { search?:string; category?:string; minPrice?:number; maxPrice?:number; rating?:number; sort?:string; page?:number; limit?:number };

@@ -1,0 +1,1 @@
+import {StoreHeader} from "@/components/layout/store-header"; import {StoreFooter} from "@/components/layout/store-footer"; import {CartView} from "@/components/cart/cart-view"; export default function Page(){return <><StoreHeader/><CartView/><StoreFooter/></>}

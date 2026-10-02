@@ -1,0 +1,1 @@
+import {NextResponse} from "next/server"; import {getProductById} from "@/services/product.service"; export async function GET(_:Request,{params}:{params:Promise<{id:string}>}){const p=await getProductById((await params).id);return p?NextResponse.json(p):NextResponse.json({error:"Product not found"},{status:404})}
