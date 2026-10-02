@@ -26,7 +26,7 @@ function SelectTrigger({
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDown size={16} className="shrink-0 text-[var(--muted)]" />
+        <ChevronDown size={16} className="shrink-0 text-(--muted)" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );

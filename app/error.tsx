@@ -13,10 +13,10 @@ export default function Error({
   return (
     <>
       <StoreHeader />
-      <main className="mx-auto my-[120px] max-w-[600px] px-4 text-center">
+      <main className="mx-auto my-30 max-w-[600px] px-4 text-center">
         <p className="kicker">Something went wrong</p>
         <h1 className="my-2 text-[40px] tracking-[-1px]">We couldn&apos;t load this page</h1>
-        <p className="mb-6 leading-[1.6] text-[var(--muted)]">Please check your connection and try again.</p>
+        <p className="mb-6 leading-[1.6] text-(--muted)">Please check your connection and try again.</p>
         <Button type="button" onClick={reset}>
           Try again
         </Button>

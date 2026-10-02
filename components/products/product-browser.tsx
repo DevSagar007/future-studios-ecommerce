@@ -173,7 +173,7 @@ export function ProductBrowser({ result }: { result: ProductBrowserResult }) {
 
       <div className="shop-toolbar">
         <div className="search-box h-10 rounded-md border border-[var(--line)] bg-white px-3">
-          <Search size={18} className="shrink-0 text-[var(--muted)]" aria-hidden="true" />
+          <Search size={18} className="shrink-0 text-(--muted)" aria-hidden="true" />
           <Input
             className="h-9 min-w-0 border-0 bg-transparent px-0 shadow-none focus:border-transparent focus:ring-0"
             value={search}
@@ -305,7 +305,7 @@ export function ProductBrowser({ result }: { result: ProductBrowserResult }) {
                 {pages.map((item, index) =>
                   item === "gap" ? (
                     <PaginationItem key={`gap-${index}`}>
-                      <span className="flex w-[30px] items-center justify-center text-[var(--muted)]">…</span>
+                      <span className="flex w-[30px] items-center justify-center text-(--muted)">…</span>
                     </PaginationItem>
                   ) : (
                     <PaginationItem key={item}>

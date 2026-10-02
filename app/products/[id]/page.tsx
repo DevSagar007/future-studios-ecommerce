@@ -36,7 +36,7 @@ export default async function Page({ params }: { params: Params }) {
   return (
     <>
       <StoreHeader />
-      <main className="mx-auto mt-[70px] w-[calc(100%-32px)] max-w-[1270px]">
+      <main className="mx-auto mt-[70px] w-[calc(100%_-_32px)] max-w-[1270px]">
         <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Shop", href: "/products" }, { label: product.name }]} />
         <div className="grid gap-[55px] bg-white p-[25px] min-[801px]:grid-cols-2">
           <div className="min-w-0">
@@ -63,7 +63,7 @@ export default async function Page({ params }: { params: Params }) {
             <div className="my-[22px] text-[25px] font-bold text-[var(--text)]">
               {taka(product.price)} <del className="ml-2.5 text-[13px] text-[#94a3b8]">{taka(product.originalPrice)}</del>
             </div>
-            <p className="max-w-[560px] leading-[1.7] text-[var(--muted)]">{product.description}</p>
+            <p className="max-w-[560px] leading-[1.7] text-(--muted)">{product.description}</p>
             <div className={`my-5 text-[13px] ${product.stock <= 3 ? "text-red-600" : "text-green-600"}`}>
               ● {product.stock} available
             </div>
@@ -79,7 +79,7 @@ export default async function Page({ params }: { params: Params }) {
 
         <section className="mt-[50px]">
           <h2 className="mb-1.5 text-[26px]">Customer reviews</h2>
-          <p className="mt-0 text-[13px] text-[var(--muted)]">
+          <p className="mt-0 text-[13px] text-(--muted)">
             {product.rating} out of 5 · {reviewCount} reviews
           </p>
           {product.reviews.length > 0 ? (
@@ -93,12 +93,12 @@ export default async function Page({ params }: { params: Params }) {
                       {"☆".repeat(Math.max(0, 5 - review.rating))}
                     </span>
                   </div>
-                  <p className="m-0 text-sm leading-[1.6] text-[var(--muted)]">{review.comment}</p>
+                  <p className="m-0 text-sm leading-[1.6] text-(--muted)">{review.comment}</p>
                 </article>
               ))}
             </div>
           ) : (
-            <p className="text-[var(--muted)]">
+            <p className="text-(--muted)">
               No written reviews yet. Be the first to review this product.
             </p>
           )}

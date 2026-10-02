@@ -40,7 +40,7 @@ export default function Page() {
         <StoreHeader />
         <main className="px-5 py-[120px] mt-[70px] text-center">
           <h1 className="mb-4 text-4xl">Order placed successfully!</h1>
-          <p className="mb-6 text-[var(--muted)]">Thank you for shopping with Falcon.</p>
+          <p className="mb-6 text-(--muted)">Thank you for shopping with Falcon.</p>
           <Button asChild>
             <Link href="/products">Continue shopping</Link>
           </Button>
@@ -53,13 +53,13 @@ export default function Page() {
   return (
     <>
       <StoreHeader />
-      <main className="mx-auto mt-[70px] w-[calc(100%-32px)] max-w-[1270px]">
+      <main className="mx-auto mt-[70px] w-[calc(100%_-_32px)] max-w-[1270px]">
         <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Checkout" }]} />
         <h1 className="mb-[30px] text-[40px] tracking-[-1px]">Checkout</h1>
         {items.length === 0 ? (
           <div className="rounded-lg bg-white px-5 py-20 text-center">
             <h2 className="mb-3 text-2xl">Your cart is empty</h2>
-            <p className="mb-6 text-[var(--muted)]">Add a few products before checking out.</p>
+            <p className="mb-6 text-(--muted)">Add a few products before checking out.</p>
             <Button asChild>
               <Link href="/products">Browse products</Link>
             </Button>

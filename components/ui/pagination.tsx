@@ -76,7 +76,7 @@ function PaginationEllipsis({ className, ...props }: React.ComponentProps<"span"
     <span
       aria-hidden
       data-slot="pagination-ellipsis"
-      className={cn("flex h-9 w-9 items-center justify-center text-[var(--muted)]", className)}
+      className={cn("flex h-9 w-9 items-center justify-center text-(--muted)", className)}
       {...props}
     >
       <MoreHorizontal size={16} />

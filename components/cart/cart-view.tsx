@@ -18,7 +18,7 @@ export function CartView() {
   const subtotal = cartSubtotal(items);
 
   return (
-    <main className="mx-auto mt-[70px] w-[calc(100%-32px)] max-w-[1270px]">
+    <main className="mx-auto mt-[70px] w-[calc(100%_-_32px)] max-w-[1270px]">
       <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "My Cart" }]} />
       <h1 className="mb-8 text-4xl tracking-[-1px]">My Cart</h1>
       {items.length === 0 ? (
@@ -40,7 +40,7 @@ export function CartView() {
                   <Link href={`/products/${item.id}`} className="block min-w-0">
                     <h3 className="line-clamp-2 break-words text-base font-semibold">{item.name}</h3>
                   </Link>
-                  <p className="mt-1 text-sm text-[var(--muted)]">{item.category}</p>
+                  <p className="mt-1 text-sm text-(--muted)">{item.category}</p>
                   <div className="mt-4 inline-flex h-9 items-center gap-1 rounded-[22px] border border-[var(--line)] px-1">
                     <Button
                       type="button"
@@ -91,7 +91,7 @@ export function CartView() {
               <span>Price ({cartCount(items)} items)</span><b>{taka(subtotal)}</b>
             </div>
             <div className="mt-3 flex items-center justify-between gap-4 text-sm">
-              <span>Shipping fee</span><em className="not-italic text-[var(--muted)]">To be added</em>
+              <span>Shipping fee</span><em className="not-italic text-(--muted)">To be added</em>
             </div>
             <hr className="my-5 border-[var(--line)]" />
             <div className="flex items-center justify-between gap-4 text-base">
@@ -102,7 +102,7 @@ export function CartView() {
                 Proceed to Checkout <ArrowRight size={16} />
               </Link>
             </Button>
-            <p className="mt-4 text-xs leading-5 text-[var(--muted)]">
+            <p className="mt-4 text-xs leading-5 text-(--muted)">
               I have read and agree to the Terms and Conditions, Privacy Policy and Refund Policy.
             </p>
           </aside>
