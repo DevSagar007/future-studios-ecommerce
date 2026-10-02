@@ -26,13 +26,13 @@ export function ProductActions({ product }: { product: Product }) {
   };
 
   return (
-    <div className="my-[25px] flex flex-wrap gap-2.5">
-      <div className="inline-flex items-center gap-[15px] rounded-[22px] border border-[var(--line)] px-2 py-1">
+    <div className="my-6.25 flex flex-wrap gap-2.5">
+      <div className="inline-flex items-center gap-3.75 rounded-[1.375rem] border border-[var(--line)] px-2 py-1">
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="h-[23px] w-[23px] rounded-full bg-[#f1f5f9]"
+          className="h-[1.4375rem] w-[1.4375rem] rounded-full bg-[#f1f5f9]"
           onClick={() => setQuantity((q) => Math.max(1, q - 1))}
           aria-label="Decrease quantity"
           disabled={quantity <= 1}
@@ -44,7 +44,7 @@ export function ProductActions({ product }: { product: Product }) {
           type="button"
           variant="ghost"
           size="icon"
-          className="h-[23px] w-[23px] rounded-full bg-[#f1f5f9]"
+          className="h-[1.4375rem] w-[1.4375rem] rounded-full bg-[#f1f5f9]"
           onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
           aria-label="Increase quantity"
           disabled={quantity >= product.stock}

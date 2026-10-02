@@ -18,9 +18,9 @@ export function CartView() {
   const subtotal = cartSubtotal(items);
 
   return (
-    <main className="mx-auto mt-[70px] w-[calc(100%_-_32px)] max-w-[1270px]">
+    <main className="mx-auto mt-17.5 w-[calc(100%_-_32px)] max-w-[79.375rem]">
       <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "My Cart" }]} />
-      <h1 className="mb-8 text-4xl tracking-[-1px]">My Cart</h1>
+      <h1 className="mb-8 text-4xl -tracking-px">My Cart</h1>
       {items.length === 0 ? (
         <div className="rounded-lg bg-white px-5 py-20 text-center">
           <h2 className="mb-6 text-2xl">Your cart is empty</h2>
@@ -41,7 +41,7 @@ export function CartView() {
                     <h3 className="line-clamp-2 break-words text-base font-semibold">{item.name}</h3>
                   </Link>
                   <p className="mt-1 text-sm text-(--muted)">{item.category}</p>
-                  <div className="mt-4 inline-flex h-9 items-center gap-1 rounded-[22px] border border-[var(--line)] px-1">
+                  <div className="mt-4 inline-flex h-9 items-center gap-1 rounded-[1.375rem] border border-[var(--line)] px-1">
                     <Button
                       type="button"
                       variant="ghost"

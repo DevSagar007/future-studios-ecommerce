@@ -36,9 +36,9 @@ export default async function Page({ params }: { params: Params }) {
   return (
     <>
       <StoreHeader />
-      <main className="mx-auto mt-[70px] w-[calc(100%_-_32px)] max-w-[1270px]">
+      <main className="mx-auto mt-17.5 w-[calc(100%_-_32px)] max-w-[79.375rem]">
         <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Shop", href: "/products" }, { label: product.name }]} />
-        <div className="grid gap-[55px] bg-white p-[25px] min-[801px]:grid-cols-2">
+        <div className="grid gap-[3.4375rem] bg-white p-6.25 min-[801px]:grid-cols-2">
           <div className="min-w-0">
             <Image
               className="aspect-square h-auto w-full object-cover"
@@ -49,22 +49,22 @@ export default async function Page({ params }: { params: Params }) {
               sizes="(max-width: 800px) 100vw, 50vw"
             />
           </div>
-          <div className="min-w-0 p-[25px]">
+          <div className="min-w-0 p-6.25">
             <p className="kicker">{product.category}</p>
-            <h1 className="my-3 text-[38px] leading-tight tracking-[-1px]">{product.name}</h1>
+            <h1 className="my-3 text-[2.375rem] leading-tight -tracking-px">{product.name}</h1>
             <div className="rating">
-              <span className="text-[16px] tracking-[1px] text-amber-500" aria-hidden="true">
+              <span className="text-base tracking-px text-amber-500" aria-hidden="true">
                 ★★★★★
               </span>
               <small>
                 {product.rating} ({reviewCount} reviews)
               </small>
             </div>
-            <div className="my-[22px] text-[25px] font-bold text-[var(--text)]">
-              {taka(product.price)} <del className="ml-2.5 text-[13px] text-[#94a3b8]">{taka(product.originalPrice)}</del>
+            <div className="my-5.5 text-[1.5625rem] font-bold text-[var(--text)]">
+              {taka(product.price)} <del className="ml-2.5 text-xs text-[#94a3b8]">{taka(product.originalPrice)}</del>
             </div>
-            <p className="max-w-[560px] leading-[1.7] text-(--muted)">{product.description}</p>
-            <div className={`my-5 text-[13px] ${product.stock <= 3 ? "text-red-600" : "text-green-600"}`}>
+            <p className="max-w-[35rem] leading-[1.7] text-(--muted)">{product.description}</p>
+            <div className={`my-5 text-xs ${product.stock <= 3 ? "text-red-600" : "text-green-600"}`}>
               ● {product.stock} available
             </div>
             <ProductActions product={product} />
@@ -77,18 +77,18 @@ export default async function Page({ params }: { params: Params }) {
           </div>
         </div>
 
-        <section className="mt-[50px]">
-          <h2 className="mb-1.5 text-[26px]">Customer reviews</h2>
-          <p className="mt-0 text-[13px] text-(--muted)">
+        <section className="mt-12.5">
+          <h2 className="mb-1.5 text-[1.625rem]">Customer reviews</h2>
+          <p className="mt-0 text-xs text-(--muted)">
             {product.rating} out of 5 · {reviewCount} reviews
           </p>
           {product.reviews.length > 0 ? (
-            <div className="mt-[18px] grid gap-3.5">
+            <div className="mt-4.5 grid gap-3.5">
               {product.reviews.map((review) => (
-                <article className="rounded-[6px] bg-white p-[18px]" key={review.id}>
+                <article className="rounded-lg bg-white p-4.5" key={review.id}>
                   <div className="mb-2 flex items-center justify-between gap-3">
                     <b>{review.author}</b>
-                    <span className="text-[16px] tracking-[1px] text-amber-500" aria-label={`${review.rating} out of 5 stars`}>
+                    <span className="text-base tracking-px text-amber-500" aria-label={`${review.rating} out of 5 stars`}>
                       {"★".repeat(review.rating)}
                       {"☆".repeat(Math.max(0, 5 - review.rating))}
                     </span>
@@ -105,8 +105,8 @@ export default async function Page({ params }: { params: Params }) {
         </section>
 
         {related.length > 0 && (
-          <section className="mt-[75px]">
-            <h2 className="mb-6 text-[26px]">Related products</h2>
+          <section className="mt-[4.6875rem]">
+            <h2 className="mb-6 text-[1.625rem]">Related products</h2>
             <ProductGrid items={related} />
           </section>
         )}

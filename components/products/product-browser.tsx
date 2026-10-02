@@ -214,7 +214,7 @@ export function ProductBrowser({ result }: { result: ProductBrowserResult }) {
               value={category}
               onValueChange={(value) => setFilter("category", value === "all" ? "" : value)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="mt-1.75">
                 <SelectValue>{category === "all" ? "All categories" : category}</SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -253,7 +253,7 @@ export function ProductBrowser({ result }: { result: ProductBrowserResult }) {
               value={rating || "any"}
               onValueChange={(value) => setFilter("rating", value === "any" ? "" : value)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="mt-1.75">
                 <SelectValue>{RATING_LABELS[rating] ?? RATING_LABELS[""]}</SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -305,7 +305,7 @@ export function ProductBrowser({ result }: { result: ProductBrowserResult }) {
                 {pages.map((item, index) =>
                   item === "gap" ? (
                     <PaginationItem key={`gap-${index}`}>
-                      <span className="flex w-[30px] items-center justify-center text-(--muted)">…</span>
+                      <span className="flex w-7.5 items-center justify-center text-(--muted)">…</span>
                     </PaginationItem>
                   ) : (
                     <PaginationItem key={item}>
