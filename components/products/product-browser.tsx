@@ -166,9 +166,7 @@ export function ProductBrowser({ result }: { result: ProductBrowserResult }) {
       <div className="shop-heading">
         <div>
           <h1>
-            Find your
-            <br />
-            <em>everyday.</em>
+            Find your <em>everyday</em>
           </h1>
         </div>
       </div>

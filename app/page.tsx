@@ -26,7 +26,7 @@ export default async function Home() {
             <h1>
               Everyday things.
               <br />
-              <em>Better chosen.</em>
+              <em>Better chosen</em>
             </h1>
             <p>
               Experience a new platform for discovering useful, beautiful things made for modern
@@ -53,7 +53,7 @@ export default async function Home() {
           <div className="section-heading">
             <div>
               <p className="kicker">Popular now</p>
-              <h2>Made for your everyday.</h2>
+              <h2>Made for your everyday</h2>
             </div>
             <Link href="/products">
               View all <ChevronRight size={16} />
@@ -67,7 +67,7 @@ export default async function Home() {
             <h2>
               Good design
               <br />
-              should feel easy.
+              should feel easy
             </h2>
             <Button asChild>
               <Link href="/products">Explore collection</Link>
