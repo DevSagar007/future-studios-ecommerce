@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Minus, Plus, ShoppingCart, Check } from "lucide-react";
 import type { Product } from "@/types/product";
 import { useCartStore } from "@/store/cart.store";
+import { Button } from "@/components/ui/button";
 
 export function ProductActions({ product }: { product: Product }) {
   const add = useCartStore((s) => s.add);
@@ -27,27 +28,31 @@ export function ProductActions({ product }: { product: Product }) {
   return (
     <div className="product-actions">
       <div className="quantity">
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon"
           onClick={() => setQuantity((q) => Math.max(1, q - 1))}
           aria-label="Decrease quantity"
           disabled={quantity <= 1}
         >
           <Minus size={14} />
-        </button>
+        </Button>
         <span>{quantity}</span>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon"
           onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
           aria-label="Increase quantity"
           disabled={quantity >= product.stock}
         >
           <Plus size={14} />
-        </button>
+        </Button>
       </div>
-      <button type="button" className="primary-button" onClick={handleAdd}>
+      <Button type="button" onClick={handleAdd}>
         {added ? <Check size={17} /> : <ShoppingCart size={17} />} {added ? "Added" : "Add to Cart"}
-      </button>
+      </Button>
     </div>
   );
 }

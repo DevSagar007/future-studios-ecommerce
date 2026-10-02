@@ -5,6 +5,8 @@ import { Search, ShoppingCart, Menu, X, UserRound } from "lucide-react";
 import { useState } from "react";
 import { useCartStore } from "@/store/cart.store";
 import { cartCount } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export function StoreHeader() {
   const [open, setOpen] = useState(false);
@@ -16,15 +18,17 @@ export function StoreHeader() {
       </div>
       <header className="header">
         <div className="header-inner">
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             className="mobile-menu"
             onClick={() => setOpen((o) => !o)}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
           >
             {open ? <X /> : <Menu />}
-          </button>
+          </Button>
           <Link href="/" className="logo">
             FALCON<span>.</span>
           </Link>
@@ -48,7 +52,7 @@ export function StoreHeader() {
             </Link>
             <Link href="/cart" className="cart-icon" aria-label={`Cart, ${count} items`}>
               <ShoppingCart size={20} />
-              {count > 0 && <b>{count}</b>}
+              {count > 0 && <Badge>{count}</Badge>}
             </Link>
             <UserRound size={20} aria-hidden="true" />
           </div>

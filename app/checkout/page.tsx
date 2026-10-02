@@ -9,6 +9,7 @@ import { useCartStore } from "@/store/cart.store";
 import { cartSubtotal, taka } from "@/lib/utils";
 import { StoreHeader } from "@/components/layout/store-header";
 import { StoreFooter } from "@/components/layout/store-footer";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const FIELDS = [
@@ -39,9 +40,9 @@ export default function Page() {
         <main className="success">
           <h1>Order placed successfully!</h1>
           <p>Thank you for shopping with Falcon.</p>
-          <Link href="/products" className="primary-button">
-            Continue shopping
-          </Link>
+          <Button asChild>
+            <Link href="/products">Continue shopping</Link>
+          </Button>
         </main>
         <StoreFooter />
       </>
@@ -60,9 +61,9 @@ export default function Page() {
           <div className="empty">
             <h2>Your cart is empty</h2>
             <p>Add a few products before checking out.</p>
-            <Link href="/products" className="primary-button">
-              Browse products
-            </Link>
+            <Button asChild>
+              <Link href="/products">Browse products</Link>
+            </Button>
           </div>
         ) : (
           <div className="checkout-grid">
@@ -86,9 +87,7 @@ export default function Page() {
                   {errors[name] && <small role="alert">{errors[name]?.message}</small>}
                 </label>
               ))}
-              <button className="primary-button" type="submit">
-                Place Order
-              </button>
+              <Button type="submit">Place Order</Button>
             </form>
             <aside className="summary">
               <h2>Order summary</h2>

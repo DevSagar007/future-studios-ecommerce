@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { StoreHeader } from "@/components/layout/store-header";
 import { StoreFooter } from "@/components/layout/store-footer";
+import { Button } from "@/components/ui/button";
 import { getProducts } from "@/services/product.service";
 import { ProductGrid } from "@/components/products/product-grid";
 
@@ -31,9 +32,11 @@ export default async function Home() {
               Experience a new platform for discovering useful, beautiful things made for modern
               life.
             </p>
-            <Link href="/products" className="primary-button">
-              Shop now <ArrowRight size={17} />
-            </Link>
+            <Button asChild>
+              <Link href="/products">
+                Shop now <ArrowRight size={17} />
+              </Link>
+            </Button>
           </div>
           <div className="hero-image">
             <Image
@@ -66,9 +69,9 @@ export default async function Home() {
               <br />
               should feel easy.
             </h2>
-            <Link href="/products" className="primary-button">
-              Explore collection
-            </Link>
+            <Button asChild>
+              <Link href="/products">Explore collection</Link>
+            </Button>
           </div>
           <Image
             src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1200&q=85"

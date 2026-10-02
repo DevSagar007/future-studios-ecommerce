@@ -6,6 +6,8 @@ import { Star, ShoppingCart } from "lucide-react";
 import type { Product } from "@/types/product";
 import { taka } from "@/lib/utils";
 import { useCartStore } from "@/store/cart.store";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export function ProductCard({ p }: { p: Product }) {
   const add = useCartStore((s) => s.add);
@@ -21,7 +23,7 @@ export function ProductCard({ p }: { p: Product }) {
           height={600}
           sizes="(max-width: 800px) 50vw, (max-width: 1080px) 33vw, 25vw"
         />
-        {discount > 0 && <span>-{discount}%</span>}
+        {discount > 0 && <Badge variant="muted">-{discount}%</Badge>}
       </Link>
       <div className="product-card-body">
         <Link href={`/products/${p.id}`}>
@@ -36,9 +38,15 @@ export function ProductCard({ p }: { p: Product }) {
             <b>{taka(p.price)}</b>
             <del>{taka(p.originalPrice)}</del>
           </div>
-          <button type="button" aria-label={`Add ${p.name} to cart`} onClick={() => add(p)}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label={`Add ${p.name} to cart`}
+            onClick={() => add(p)}
+          >
             <ShoppingCart size={17} />
-          </button>
+          </Button>
         </div>
       </div>
     </article>

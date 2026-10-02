@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Trash2, Minus, Plus, ArrowRight } from "lucide-react";
 import { useCartStore } from "@/store/cart.store";
 import { cartCount, cartSubtotal, taka } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export function CartView() {
   const items = useCartStore((s) => s.items);
@@ -23,9 +24,9 @@ export function CartView() {
       {items.length === 0 ? (
         <div className="empty">
           <h2>Your cart is empty</h2>
-          <Link className="primary-button" href="/products">
-            Continue shopping
-          </Link>
+          <Button asChild>
+            <Link href="/products">Continue shopping</Link>
+          </Button>
         </div>
       ) : (
         <div className="cart-layout">
@@ -39,32 +40,38 @@ export function CartView() {
                   </Link>
                   <p>{item.category}</p>
                   <div className="quantity">
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
                       onClick={() => dec(item.id)}
                       aria-label={`Decrease quantity of ${item.name}`}
                     >
                       <Minus size={14} />
-                    </button>
+                    </Button>
                     <span>{String(item.quantity).padStart(2, "0")}</span>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
                       onClick={() => inc(item.id)}
                       aria-label={`Increase quantity of ${item.name}`}
                     >
                       <Plus size={14} />
-                    </button>
+                    </Button>
                   </div>
                 </div>
                 <div className="cart-price">
                   <b>{taka(item.price * item.quantity)}</b>
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
                     onClick={() => remove(item.id)}
                     aria-label={`Remove ${item.name} from cart`}
                   >
                     <Trash2 size={16} />
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
@@ -84,9 +91,11 @@ export function CartView() {
               <span>Sub Total</span>
               <b>{taka(subtotal)}</b>
             </div>
-            <Link href="/checkout" className="primary-button">
-              Proceed to Checkout <ArrowRight size={16} />
-            </Link>
+            <Button asChild>
+              <Link href="/checkout">
+                Proceed to Checkout <ArrowRight size={16} />
+              </Link>
+            </Button>
             <p className="terms">
               I have read and agree to the Terms and Conditions, Privacy Policy and Refund Policy.
             </p>
