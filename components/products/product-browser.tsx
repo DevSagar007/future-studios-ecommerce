@@ -7,6 +7,7 @@ import type { Product } from "@/types/product";
 import { ProductGrid } from "@/components/products/product-grid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -161,25 +162,22 @@ export function ProductBrowser({ result }: { result: ProductBrowserResult }) {
 
   return (
     <main className="shop-page">
-      <div className="breadcrumb">
-        Home <span>›</span> Shop
-      </div>
+      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "My Shop" }]} />
       <div className="shop-heading">
         <div>
-          <p className="kicker">Our collection</p>
           <h1>
             Find your
             <br />
             <em>everyday.</em>
           </h1>
         </div>
-        <p>Thoughtful essentials, fair prices and the little things that make life better.</p>
       </div>
 
       <div className="shop-toolbar">
-        <div className="search-box">
-          <Search size={18} aria-hidden="true" />
+        <div className="search-box h-10 rounded-md border border-[var(--line)] bg-white px-3">
+          <Search size={18} className="shrink-0 text-[var(--muted)]" aria-hidden="true" />
           <Input
+            className="h-9 min-w-0 border-0 bg-transparent px-0 shadow-none focus:border-transparent focus:ring-0"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search products..."
@@ -309,7 +307,7 @@ export function ProductBrowser({ result }: { result: ProductBrowserResult }) {
                 {pages.map((item, index) =>
                   item === "gap" ? (
                     <PaginationItem key={`gap-${index}`}>
-                      <span className="pagination-gap">…</span>
+                      <span className="flex w-[30px] items-center justify-center text-[var(--muted)]">…</span>
                     </PaginationItem>
                   ) : (
                     <PaginationItem key={item}>

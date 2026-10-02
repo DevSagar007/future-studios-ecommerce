@@ -14,8 +14,8 @@ export function ProductCard({ p }: { p: Product }) {
   const discount = Math.max(0, Math.round((1 - p.price / p.originalPrice) * 100));
 
   return (
-    <article className="product-card">
-      <Link href={`/products/${p.id}`} className="product-thumb">
+    <article className="product-card min-w-0">
+      <Link href={`/products/${p.id}`} className="product-thumb block aspect-square overflow-hidden">
         <Image
           src={p.image}
           alt={p.name}
@@ -25,18 +25,18 @@ export function ProductCard({ p }: { p: Product }) {
         />
         {discount > 0 && <Badge variant="muted">-{discount}%</Badge>}
       </Link>
-      <div className="product-card-body">
-        <Link href={`/products/${p.id}`}>
-          <h3>{p.name}</h3>
+      <div className="product-card-body min-w-0">
+        <Link href={`/products/${p.id}`} className="block min-w-0">
+          <h3 className="line-clamp-2 break-words">{p.name}</h3>
         </Link>
         <div className="rating">
           <Star size={14} fill="currentColor" aria-hidden="true" /> {p.rating}{" "}
           <small>({p.reviews.length + 18})</small>
         </div>
-        <div className="card-bottom">
-          <div>
-            <b>{taka(p.price)}</b>
-            <del>{taka(p.originalPrice)}</del>
+        <div className="card-bottom flex-wrap gap-2">
+          <div className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-1">
+            <b className="whitespace-nowrap">{taka(p.price)}</b>
+            <del className="whitespace-nowrap">{taka(p.originalPrice)}</del>
           </div>
           <Button
             type="button"

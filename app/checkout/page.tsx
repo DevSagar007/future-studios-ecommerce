@@ -11,6 +11,7 @@ import { StoreHeader } from "@/components/layout/store-header";
 import { StoreFooter } from "@/components/layout/store-footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 const FIELDS = [
   ["fullName", "Full Name"],
@@ -37,9 +38,9 @@ export default function Page() {
     return (
       <>
         <StoreHeader />
-        <main className="success">
-          <h1>Order placed successfully!</h1>
-          <p>Thank you for shopping with Falcon.</p>
+        <main className="px-5 py-[120px] text-center">
+          <h1 className="mb-4 text-4xl">Order placed successfully!</h1>
+          <p className="mb-6 text-[var(--muted)]">Thank you for shopping with Falcon.</p>
           <Button asChild>
             <Link href="/products">Continue shopping</Link>
           </Button>
@@ -52,55 +53,54 @@ export default function Page() {
   return (
     <>
       <StoreHeader />
-      <main className="checkout">
-        <div className="breadcrumb">
-          Home <span>›</span> Checkout
-        </div>
-        <h1>Checkout</h1>
+      <main className="mx-auto mt-[70px] w-[calc(100%-32px)] max-w-[1270px]">
+        <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Checkout" }]} />
+        <h1 className="mb-[30px] text-[40px] tracking-[-1px]">Checkout</h1>
         {items.length === 0 ? (
-          <div className="empty">
-            <h2>Your cart is empty</h2>
-            <p>Add a few products before checking out.</p>
+          <div className="rounded-lg bg-white px-5 py-20 text-center">
+            <h2 className="mb-3 text-2xl">Your cart is empty</h2>
+            <p className="mb-6 text-[var(--muted)]">Add a few products before checking out.</p>
             <Button asChild>
               <Link href="/products">Browse products</Link>
             </Button>
           </div>
         ) : (
-          <div className="checkout-grid">
+          <div className="grid gap-[35px] min-[801px]:grid-cols-[1.5fr_1fr]">
             <form
-              className="checkout-form"
+              className="grid gap-[18px] bg-white p-7 min-[801px]:grid-cols-2 rounded-[6px]"
               noValidate
               onSubmit={handleSubmit(() => {
                 clear();
                 setSuccess(true);
               })}
             >
-              <h2>Delivery information</h2>
+              <h2 className="text-[22px] min-[801px]:col-span-2">Delivery information</h2>
               {FIELDS.map(([name, label]) => (
-                <label key={name}>
+                <label className="block text-xs text-[#475569]" key={name}>
                   {label}
                   <Input
                     {...register(name)}
+                    className="mt-2"
                     placeholder={label}
                     aria-invalid={errors[name] ? "true" : undefined}
                   />
-                  {errors[name] && <small role="alert">{errors[name]?.message}</small>}
+                  {errors[name] && <small className="mt-1 block text-red-500" role="alert">{errors[name]?.message}</small>}
                 </label>
               ))}
-              <Button type="submit">Place Order</Button>
+              <Button className="min-[801px]:col-span-2" type="submit">Place Order</Button>
             </form>
-            <aside className="summary">
-              <h2>Order summary</h2>
+            <aside className="h-max rounded-[6px] bg-white p-[25px]">
+              <h2 className="text-[22px]">Order summary</h2>
               {items.map((item) => (
-                <div key={item.id}>
+                <div className="my-[15px] flex items-center justify-between gap-4 text-sm" key={item.id}>
                   <span>
                     {item.name} × {item.quantity}
                   </span>
-                  <b>{taka(item.price * item.quantity)}</b>
+                  <b className="whitespace-nowrap">{taka(item.price * item.quantity)}</b>
                 </div>
               ))}
-              <hr />
-              <div className="total">
+              <hr className="border-0 border-t border-dashed border-[var(--line)]" />
+              <div className="mt-[15px] flex items-center justify-between text-lg">
                 <span>Total</span>
                 <b>{taka(total)}</b>
               </div>

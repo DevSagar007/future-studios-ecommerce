@@ -61,7 +61,7 @@ export default async function Home() {
           </div>
           <ProductGrid items={featured.items} />
         </section>
-        <section className="feature-banner">
+        <section className="feature-banner rounded-lg">
           <div>
             <p className="kicker">Thoughtfully selected</p>
             <h2>
