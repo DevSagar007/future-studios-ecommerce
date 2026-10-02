@@ -1,1 +1,53 @@
-"use client"; import {useState} from "react"; import {Minus,Plus,ShoppingCart,Check} from "lucide-react"; import type {Product} from "@/types/product"; import {useCartStore} from "@/store/cart.store"; export function ProductActions({product}:{product:Product}){const add=useCartStore(s=>s.add);const [q,setQ]=useState(1);const [done,setDone]=useState(false);return <div className="product-actions"><div className="quantity"><button onClick={()=>setQ(Math.max(1,q-1))}><Minus size={14}/></button><span>{q}</span><button onClick={()=>setQ(Math.min(product.stock,q+1))}><Plus size={14}/></button></div><button className="primary-button" onClick={()=>{add(product,q);setDone(true);setTimeout(()=>setDone(false),1500)}}>{done?<Check size={17}/>:<ShoppingCart size={17}/>} {done?"Added":"Add to Cart"}</button></div>}
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { Minus, Plus, ShoppingCart, Check } from "lucide-react";
+import type { Product } from "@/types/product";
+import { useCartStore } from "@/store/cart.store";
+
+export function ProductActions({ product }: { product: Product }) {
+  const add = useCartStore((s) => s.add);
+  const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+    };
+  }, []);
+
+  const handleAdd = () => {
+    add(product, quantity);
+    setAdded(true);
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+    resetTimer.current = setTimeout(() => setAdded(false), 1500);
+  };
+
+  return (
+    <div className="product-actions">
+      <div className="quantity">
+        <button
+          type="button"
+          onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+          aria-label="Decrease quantity"
+          disabled={quantity <= 1}
+        >
+          <Minus size={14} />
+        </button>
+        <span>{quantity}</span>
+        <button
+          type="button"
+          onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
+          aria-label="Increase quantity"
+          disabled={quantity >= product.stock}
+        >
+          <Plus size={14} />
+        </button>
+      </div>
+      <button type="button" className="primary-button" onClick={handleAdd}>
+        {added ? <Check size={17} /> : <ShoppingCart size={17} />} {added ? "Added" : "Add to Cart"}
+      </button>
+    </div>
+  );
+}

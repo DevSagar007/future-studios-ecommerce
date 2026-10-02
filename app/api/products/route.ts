@@ -1,1 +1,27 @@
-import {NextRequest,NextResponse} from "next/server"; import {getProducts} from "@/services/product.service"; export async function GET(r:NextRequest){const p=r.nextUrl.searchParams;const n=(k:string)=>p.has(k)?Number(p.get(k)):undefined;return NextResponse.json(await getProducts({search:p.get("search")||undefined,category:p.get("category")||undefined,sort:p.get("sort")||undefined,minPrice:n("minPrice"),maxPrice:n("maxPrice"),rating:n("rating"),page:n("page"),limit:n("limit")}))}
+import { NextRequest, NextResponse } from "next/server";
+import { getProducts } from "@/services/product.service";
+
+export async function GET(request: NextRequest) {
+  const params = request.nextUrl.searchParams;
+  const number = (key: string) => {
+    if (!params.has(key)) return undefined;
+    const value = Number(params.get(key));
+    return Number.isFinite(value) ? value : undefined;
+  };
+
+  try {
+    const result = await getProducts({
+      search: params.get("search") || undefined,
+      category: params.get("category") || undefined,
+      sort: params.get("sort") || undefined,
+      minPrice: number("minPrice"),
+      maxPrice: number("maxPrice"),
+      rating: number("rating"),
+      page: number("page"),
+      limit: number("limit"),
+    });
+    return NextResponse.json(result);
+  } catch {
+    return NextResponse.json({ error: "Failed to load products" }, { status: 500 });
+  }
+}
