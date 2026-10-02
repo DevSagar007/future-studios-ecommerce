@@ -7,6 +7,7 @@ import { useCartStore } from "@/store/cart.store";
 import { cartCount, cartSubtotal, taka } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { Tooltip } from "@/components/ui/tooltip";
 
 export function CartView() {
   const items = useCartStore((s) => s.items);
@@ -40,12 +41,12 @@ export function CartView() {
                     <h3 className="line-clamp-2 break-words text-base font-semibold">{item.name}</h3>
                   </Link>
                   <p className="mt-1 text-sm text-[var(--muted)]">{item.category}</p>
-                  <div className="mt-4 inline-flex h-9 items-center overflow-hidden rounded border border-[var(--line)]">
+                  <div className="mt-4 inline-flex h-9 items-center gap-1 rounded-[22px] border border-[var(--line)] px-1">
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="h-9 w-9"
+                      className="h-7 w-7 rounded-full bg-[#f1f5f9]"
                       onClick={() => dec(item.id)}
                       aria-label={`Decrease quantity of ${item.name}`}
                     >
@@ -56,7 +57,7 @@ export function CartView() {
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="h-9 w-9"
+                      className="h-7 w-7 rounded-full bg-[#f1f5f9]"
                       onClick={() => inc(item.id)}
                       aria-label={`Increase quantity of ${item.name}`}
                     >
@@ -66,16 +67,18 @@ export function CartView() {
                 </div>
                 <div className="col-span-2 flex items-center justify-between gap-3 min-[601px]:col-span-1 min-[601px]:flex-col min-[601px]:items-end min-[601px]:justify-between">
                   <b className="whitespace-nowrap text-base">{taka(item.price * item.quantity)}</b>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 text-red-500 hover:bg-red-50"
-                    onClick={() => remove(item.id)}
-                    aria-label={`Remove ${item.name} from cart`}
-                  >
-                    <Trash2 size={16} />
-                  </Button>
+                  <Tooltip content="Remove from cart">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-9 w-9 rounded-full text-red-500 hover:bg-red-50"
+                      onClick={() => remove(item.id)}
+                      aria-label={`Remove ${item.name} from cart`}
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </Tooltip>
                 </div>
               </div>
             ))}
