@@ -49,6 +49,7 @@ export function CartView() {
                       className="h-7 w-7 rounded-full bg-[#f1f5f9]"
                       onClick={() => dec(item.id)}
                       aria-label={`Decrease quantity of ${item.name}`}
+                      disabled={item.quantity <= 1}
                     >
                       <Minus size={14} />
                     </Button>
@@ -60,6 +61,7 @@ export function CartView() {
                       className="h-7 w-7 rounded-full bg-[#f1f5f9]"
                       onClick={() => inc(item.id)}
                       aria-label={`Increase quantity of ${item.name}`}
+                      disabled={item.quantity >= item.stock}
                     >
                       <Plus size={14} />
                     </Button>

@@ -38,7 +38,7 @@ export default function Page() {
     return (
       <>
         <StoreHeader />
-        <main className="px-5 py-[120px] text-center">
+        <main className="px-5 py-[120px] mt-[70px] text-center">
           <h1 className="mb-4 text-4xl">Order placed successfully!</h1>
           <p className="mb-6 text-[var(--muted)]">Thank you for shopping with Falcon.</p>
           <Button asChild>

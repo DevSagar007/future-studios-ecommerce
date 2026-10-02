@@ -53,7 +53,7 @@ export default async function Page({ params }: { params: Params }) {
             <p className="kicker">{product.category}</p>
             <h1 className="my-3 text-[38px] leading-tight tracking-[-1px]">{product.name}</h1>
             <div className="rating">
-              <span className="text-[13px] tracking-[1px] text-amber-500" aria-hidden="true">
+              <span className="text-[16px] tracking-[1px] text-amber-500" aria-hidden="true">
                 ★★★★★
               </span>
               <small>
@@ -88,7 +88,7 @@ export default async function Page({ params }: { params: Params }) {
                 <article className="rounded-[6px] bg-white p-[18px]" key={review.id}>
                   <div className="mb-2 flex items-center justify-between gap-3">
                     <b>{review.author}</b>
-                    <span className="text-[13px] tracking-[1px] text-amber-500" aria-label={`${review.rating} out of 5 stars`}>
+                    <span className="text-[16px] tracking-[1px] text-amber-500" aria-label={`${review.rating} out of 5 stars`}>
                       {"★".repeat(review.rating)}
                       {"☆".repeat(Math.max(0, 5 - review.rating))}
                     </span>
