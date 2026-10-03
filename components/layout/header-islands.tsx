@@ -95,7 +95,7 @@ export function CategoryMenu({ children }: { children: ReactNode }) {
         onClick={(event) => {
           if ((event.target as HTMLElement).closest("a")) setOpen(false);
         }}
-        className={`${open ? "flex" : "hidden"} absolute left-4 right-4 top-full z-10 max-h-[calc(100vh_-_120px)] flex-col gap-4 overflow-y-auto bg-white p-4.5 shadow-[0_8px_25px_rgba(15,23,42,.13)] min-[801px]:static min-[801px]:flex min-[801px]:max-h-none min-[801px]:flex-row min-[801px]:flex-wrap min-[801px]:gap-8 min-[801px]:overflow-visible min-[801px]:bg-transparent min-[801px]:p-0 min-[801px]:shadow-none max-[1200px]:gap-3`}
+        className={`${open ? "flex" : "hidden"} absolute left-4 right-4 top-full z-10 max-h-[calc(100vh-120px)] flex-col gap-4 overflow-y-auto bg-white p-4.5 shadow-[0_8px_25px_rgba(15,23,42,.13)] min-[801px]:static min-[801px]:flex min-[801px]:max-h-none min-[801px]:flex-row min-[801px]:flex-wrap min-[801px]:gap-8 min-[801px]:overflow-visible min-[801px]:bg-transparent min-[801px]:p-0 min-[801px]:shadow-none max-[1200px]:gap-3`}
       >
         {children}
       </nav>

@@ -4,15 +4,14 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        // `!` keeps these ahead of the unlayered `a`/`button` resets in globals.css.
-        default: "rounded-[5px] border-0 bg-(--teal) px-5 py-3 text-[16px]! font-medium! text-white! hover:bg-[#009c80]",
-        outline: "border border-(--line) bg-white text-[var(--text)] hover:bg-[#f8fafc]",
+        default: "rounded-[5px] border-0 bg-(--teal) px-5 py-3 text-[16px] font-medium text-white hover:bg-[#009c80]",
+        outline: "border border-(--line) bg-white text-(--text) hover:bg-[#f8fafc]",
         ghost: "bg-transparent",
-        link: "text-[var(--teal)] underline-offset-4 hover:underline",
+        link: "text-(--teal) underline-offset-4 hover:underline",
       },
       size: {
         default: "",

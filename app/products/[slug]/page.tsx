@@ -88,7 +88,7 @@ export default async function Page({ params }: { params: Params }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product)).replace(/</g, "\\u003c") }}
       />
-      <main className="mx-auto mt-17.5 w-[calc(100%_-_32px)] max-w-[79.375rem]">
+      <main className="mx-auto mt-17.5 w-[calc(100%-32px)] max-w-317.5">
         <Breadcrumb
           items={[
             { label: "Home", href: "/" },
@@ -97,7 +97,7 @@ export default async function Page({ params }: { params: Params }) {
             { label: product.name },
           ]}
         />
-        <div className="grid gap-[3.4375rem] rounded-lg bg-white p-6.25 max-[600px]:gap-4 max-[600px]:p-4 min-[801px]:grid-cols-2">
+        <div className="grid gap-13.75 rounded-lg bg-white p-6.25 max-[600px]:gap-4 max-[600px]:p-4 min-[801px]:grid-cols-2">
           <div className="min-w-0">
             <Image
               className="aspect-square h-auto w-full rounded-md object-cover"
@@ -111,16 +111,16 @@ export default async function Page({ params }: { params: Params }) {
           </div>
           <div className="min-w-0 p-6.25 max-[600px]:p-0">
             <p className="kicker">{product.category}</p>
-            <h1 className="my-3 break-words text-[2.375rem] leading-tight -tracking-px max-[600px]:text-[1.75rem]">
+            <h1 className="my-3 wrap-break-word text-[2.375rem] leading-tight -tracking-px max-[600px]:text-[1.75rem]">
               {product.name}
             </h1>
             <div className="flex items-center gap-1 text-[13px] text-[#f59e0b]">
               <RatingStars rating={product.rating} className="text-base" />
               <small className="text-[11px] text-(--muted)">
-                {product.rating} out of 5 · <a href="#reviews" className="underline-offset-2 hover:underline">{reviewLabel(reviewCount)}</a>
+                {product.rating} out of 5 · <a href="#reviews">{reviewLabel(reviewCount)}</a>
               </small>
             </div>
-            <div className="my-5.5 flex flex-wrap items-baseline gap-x-2.5 text-[1.5625rem] font-bold text-[var(--text)]">
+            <div className="my-5.5 flex flex-wrap items-baseline gap-x-2.5 text-[1.5625rem] font-bold text-(--text)">
               {taka(product.price)}
               {discount > 0 && (
                 <>
@@ -134,13 +134,13 @@ export default async function Page({ params }: { params: Params }) {
                 </>
               )}
             </div>
-            <p className="max-w-[35rem] leading-[1.7] text-(--muted)">{product.description}</p>
+            <p className="max-w-140 leading-[1.7] text-(--muted)">{product.description}</p>
             <p className={`my-5 text-xs ${!inStock || product.stock <= 3 ? "text-red-600" : "text-green-700"}`}>
               <span aria-hidden="true">● </span>
               {inStock ? `In stock · ${product.stock} available` : "Out of stock"}
             </p>
             <ProductActions product={toCartProduct(product)} />
-            <dl className="m-0 grid gap-3 border-t border-[var(--line)] pt-4 text-xs min-[801px]:grid-cols-2">
+            <dl className="m-0 grid gap-3 border-t border-(--line) pt-4 text-xs min-[801px]:grid-cols-2">
               <dt className="font-bold">Delivery</dt>
               <dd className="m-0">No delivery fee in this demo store</dd>
               <dt className="font-bold">Sold by</dt>
@@ -172,7 +172,7 @@ export default async function Page({ params }: { params: Params }) {
         </section>
 
         {related.length > 0 && (
-          <section className="mt-[4.6875rem]" aria-labelledby="related-heading">
+          <section className="mt-18.75" aria-labelledby="related-heading">
             <h2 id="related-heading" className="mb-6 text-[1.625rem]">Related products</h2>
             <ProductGrid items={related} />
           </section>

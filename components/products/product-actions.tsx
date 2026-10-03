@@ -36,7 +36,7 @@ export function ProductActions({ product }: { product: CartProduct }) {
   return (
     <div className="my-6.25 flex flex-wrap gap-2.5">
       <div
-        className="inline-flex items-center gap-3.75 rounded-[1.375rem] border border-[var(--line)] px-2 py-1"
+        className="inline-flex items-center gap-3.75 rounded-[1.375rem] border border-(--line) px-2 py-1"
         role="group"
         aria-label="Quantity"
       >

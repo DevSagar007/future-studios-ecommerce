@@ -29,7 +29,7 @@ const CartLine = memo(function CartLine({ item, inc, dec, remove }: { item: Cart
       </Link>
       <div className="min-w-0">
         <Link href={href} className="block min-w-0">
-          <h2 className="line-clamp-2 break-words text-base font-semibold">{item.name}</h2>
+          <h2 className="line-clamp-2 wrap-break-word text-base font-semibold">{item.name}</h2>
         </Link>
         <p className="mt-1 text-sm text-(--muted)">
           {item.category} · {taka(item.price)} each
@@ -97,7 +97,7 @@ export function CartView() {
   const totals = cartTotals(items);
 
   return (
-    <main className="mx-auto mt-17.5 w-[calc(100%_-_32px)] max-w-[79.375rem]">
+    <main className="mx-auto mt-17.5 w-[calc(100%-32px)] max-w-317.5">
       <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "My Cart" }]} />
       <h1 className="mb-8 text-4xl -tracking-px">My Cart</h1>
       {!hydrated ? (

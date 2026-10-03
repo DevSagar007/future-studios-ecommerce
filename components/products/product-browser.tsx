@@ -55,7 +55,7 @@ function SkeletonGrid() {
     <div className="grid grid-cols-[repeat(4,1fr)] gap-4.5 max-[1081px]:grid-cols-3 max-[601px]:grid-cols-2 max-[601px]:gap-3" aria-hidden="true">
       {Array.from({ length: SKELETON_COUNT }, (_, i) => (
         <Skeleton
-          className="aspect-square animate-[shine_1.2s_infinite] bg-transparent bg-[linear-gradient(90deg,#e2e8f0,#f8fafc,#e2e8f0)] bg-[length:200%]"
+          className="aspect-square animate-[shine_1.2s_infinite] bg-transparent bg-[linear-gradient(90deg,#e2e8f0,#f8fafc,#e2e8f0)] bg-size-[200%]"
           key={i}
         />
       ))}
@@ -188,18 +188,18 @@ export function ProductBrowser({
   const hasFilters = searchParams.toString() !== "";
 
   return (
-    <main className="mx-auto my-17.5 w-[calc(100%_-_32px)] max-w-[79.375rem]">
+    <main className="mx-auto my-17.5 w-[calc(100%-32px)] max-w-317.5">
       <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Shop" }]} />
       <div className="mb-8.75 flex items-end justify-between">
         <div>
-          <h1 className="my-4.5 text-[clamp(45px,5vw,74px)] leading-[1.04] tracking-[-3px] max-[601px]:tracking-[-1.5px]">
+          <h1 className="text-[clamp(45px,5vw,74px)] leading-[1.04] tracking-[-3px] max-[601px]:tracking-[-1.5px]">
             Find your <em className="font-normal text-(--teal)">everyday</em>
           </h1>
         </div>
       </div>
 
       <div className="mb-6.5 flex justify-between border-y border-(--line) py-3 max-[601px]:flex-col max-[601px]:gap-2.5">
-        <div className="flex h-10 w-90 items-center gap-2 rounded-md border border-[var(--line)] bg-white px-3 max-[601px]:w-full">
+        <div className="flex h-10 w-90 items-center gap-2 rounded-md border border-(--line) bg-white px-3 max-[601px]:w-full">
           <Search size={18} className="shrink-0 text-(--muted)" aria-hidden="true" />
           <Input
             type="search"
@@ -234,7 +234,7 @@ export function ProductBrowser({
             <b className="flex items-center gap-1.5">
               <SlidersHorizontal size={16} aria-hidden="true" /> Filters
             </b>
-            <Button className="text-[11px]!" type="button" variant="link" onClick={() => go("/products")} disabled={!hasFilters}>
+            <Button className="text-[11px]" type="button" variant="link" onClick={() => go("/products")} disabled={!hasFilters}>
               Clear
             </Button>
           </div>

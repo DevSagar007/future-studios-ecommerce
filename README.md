@@ -4,7 +4,7 @@ A Next.js App Router storefront built for the *Task 2 — E-Commerce Product Sea
 
 **Live demo:** https://future-studios-ecommerce.vercel.app/
 
-**Stack:** Next.js 16 (App Router, Turbopack) · React 19 · TypeScript (strict) · Tailwind CSS 4 · Zustand 5 · React Hook Form 7 · Zod 4 · Vitest
+**Stack:** Next.js 16 (App Router, Turbopack) · React 19 · TypeScript (strict) · Tailwind CSS 4 · Zustand 5 · React Hook Form 7 · Zod 4
 
 ## Setup
 
@@ -21,7 +21,6 @@ npm run dev        # http://localhost:3000
 | `npm run build` / `npm start` | Production build (prerenders all 520 product pages) / serve it |
 | `npm run lint` | ESLint (Next.js core-web-vitals + TypeScript rules) |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` | Vitest unit tests: query parsing, filtering and pagination, cart rules, totals, checkout validation |
 
 ### Environment variables
 
@@ -63,10 +62,9 @@ lib/
 schemas/checkout.schema.ts   Zod schemas: delivery form and order lines
 store/cart.store.ts          Zustand store with the persist middleware
 data/products.json           48 hand-written seed products
-tests/                       Vitest unit tests
 ```
 
-UI components never import the dataset. Everything goes through `services/`, and the pure logic in `lib/` and `schemas/` is unit-tested without React.
+UI components never import the dataset. Everything goes through `services/`, and the pure logic in `lib/` and `schemas/` has no React dependency.
 
 ## Data and API
 
@@ -171,15 +169,7 @@ The URL is the single source of truth for search, category, price, rating, sort 
 
 ## Testing
 
-- `npm test` runs 61 unit tests in `tests/` covering:
-  - query parsing edge cases;
-  - filter-before-paginate, deterministic sorting and page clamping;
-  - data validity (no invalid old prices, no duplicated reviews);
-  - related products;
-  - cart merge, stock caps and sanitizing;
-  - catalog sync and totals;
-  - checkout schema and server-side order checks.
-- The main shopping flow was also checked in headless Chromium against a production build: filters and URL sync, back/forward, refresh, redirects, 404s, JSON-LD and canonical, cart limits and persistence, corrupted storage, checkout validation, double submit, stale-price rejection, no horizontal overflow at 375/820/1280 px, and no console or hydration errors.
+- The main shopping flow was checked in headless Chromium against a production build: filters and URL sync, back/forward, refresh, redirects, 404s, JSON-LD and canonical, cart limits and persistence, corrupted storage, checkout validation, double submit, stale-price rejection, no horizontal overflow at 375/820/1280 px, and no console or hydration errors.
 
 ## Known limitations
 

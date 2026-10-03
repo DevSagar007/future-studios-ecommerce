@@ -72,7 +72,7 @@ export function CheckoutView() {
 
   if (confirmation) {
     return (
-      <main className="mx-auto mt-17.5 max-w-[37.5rem] px-5 py-20 text-center">
+      <main className="mx-auto mt-17.5 max-w-150 px-5 py-20 text-center">
         <CheckCircle2 className="mx-auto mb-4 text-(--teal)" size={48} aria-hidden="true" />
         <h1 className="mb-3 text-4xl">Order confirmed</h1>
         <p className="mb-2 text-(--muted)" role="status">
@@ -90,7 +90,7 @@ export function CheckoutView() {
   }
 
   return (
-    <main className="mx-auto mt-17.5 w-[calc(100%_-_32px)] max-w-[79.375rem]">
+    <main className="mx-auto mt-17.5 w-[calc(100%-32px)] max-w-317.5">
       <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "My Cart", href: "/cart" }, { label: "Checkout" }]} />
       <h1 className="mb-7.5 text-4xl -tracking-px">Checkout</h1>
       {!hydrated ? (
@@ -161,7 +161,7 @@ export function CheckoutView() {
             <ul className="my-4 grid list-none gap-3 p-0">
               {items.map((item) => (
                 <li className="flex items-center justify-between gap-4 text-sm" key={item.id}>
-                  <span className="min-w-0 break-words">
+                  <span className="min-w-0 wrap-break-word">
                     {item.name} × {item.quantity}
                   </span>
                   <b className="whitespace-nowrap">{taka(item.price * item.quantity)}</b>

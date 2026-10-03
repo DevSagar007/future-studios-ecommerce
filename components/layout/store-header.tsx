@@ -8,15 +8,15 @@ const CATEGORY_LINKS = ["Electronics", "Home Appliances", "Mother & Baby", "Auto
 export function StoreHeader() {
   return (
     <>
-      <div className="h-[2.125rem] bg-[#00b795] px-4 py-2.25 text-center text-xs text-white">
-        <Link href="/products" className="underline underline-offset-2">
+      <div className="h-8.5 bg-[#00b795] px-4 py-2.25 text-center text-xs text-white">
+        <Link href="/products">
           Discounts on selected products&nbsp;&nbsp; Shop Now
         </Link>
       </div>
       <div className="bg-[#0f172a] px-0 py-5 max-[800px]:py-3.5">
-        <div className="mx-auto flex w-[min(1270px,calc(100%_-_32px))] items-center justify-between gap-5 max-[800px]:flex-wrap">
-          <Link href="/" className="flex min-w-[11.25rem] max-[800px]:min-w-0">
-            <Image src="/assets/logo/footer-logo.png" alt="Falcon home" width={180} height={35} preload className="h-auto object-contain max-[800px]:w-[8.4375rem]" />
+        <div className="mx-auto flex w-[min(1270px,calc(100%-32px))] items-center justify-between gap-5 max-[800px]:flex-wrap">
+          <Link href="/" className="flex min-w-45 max-[800px]:min-w-0">
+            <Image src="/assets/logo/footer-logo.png" alt="Falcon home" width={180} height={35} preload className="h-auto object-contain max-[800px]:w-33.75" />
           </Link>
           <HeaderSearch />
           <div className="flex items-center gap-3.5 text-white">
@@ -36,7 +36,7 @@ export function StoreHeader() {
                   <Link
                     key={category}
                     href={`/products?category=${encodeURIComponent(category)}`}
-                    className="whitespace-nowrap text-base text-gray-700 hover:text-[#00b795]"
+                    className="whitespace-nowrap text-base"
                   >
                     {category}
                   </Link>
@@ -44,9 +44,9 @@ export function StoreHeader() {
               </CategoryMenu>
             </div>
             <div className="ml-auto flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm max-[1200px]:gap-x-2 max-[1200px]:text-xs">
-              <Link href="/products" className="flex items-center space-x-2 whitespace-nowrap font-medium text-[#475569] hover:text-[#00b795] max-[1200px]:space-x-1.5"><Package size={16} strokeWidth={1.5} /> <span>TRACK ORDER</span></Link>
-              <Link href="/products" className="flex items-center space-x-2 whitespace-nowrap font-medium text-[#475569] hover:text-[#00b795] max-[1200px]:space-x-1.5"><Headphones size={16} strokeWidth={1.5} /> <span>HELP CENTER</span></Link>
-              <Link href="/products" className="flex items-center space-x-2 whitespace-nowrap font-medium text-[#475569] hover:text-[#00b795] max-[1200px]:space-x-1.5"><Image src="/assets/icons/animation.png" alt="" width={16} height={16} aria-hidden="true" /> <span>SELL WITH US</span></Link>
+              <Link href="/products" className="flex items-center space-x-2 whitespace-nowrap font-medium max-[1200px]:space-x-1.5"><Package size={16} strokeWidth={1.5} /> <span>TRACK ORDER</span></Link>
+              <Link href="/products" className="flex items-center space-x-2 whitespace-nowrap font-medium max-[1200px]:space-x-1.5"><Headphones size={16} strokeWidth={1.5} /> <span>HELP CENTER</span></Link>
+              <Link href="/products" className="flex items-center space-x-2 whitespace-nowrap font-medium max-[1200px]:space-x-1.5"><Image src="/assets/icons/animation.png" alt="" width={16} height={16} aria-hidden="true" /> <span>SELL WITH US</span></Link>
             </div>
           </div>
         </div>

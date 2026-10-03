@@ -10,7 +10,7 @@ export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
           <li className="flex min-w-0 items-center space-x-2" key={`${item.label}-${index}`}>
             {index > 0 && <span aria-hidden="true" className="shrink-0 text-[#94a3b8]">›</span>}
             {item.href ? (
-              <Link href={item.href} className="whitespace-nowrap text-[#0f172a] hover:text-red-500">
+              <Link href={item.href} className="whitespace-nowrap">
                 {item.label}
               </Link>
             ) : (

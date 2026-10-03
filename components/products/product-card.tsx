@@ -31,7 +31,7 @@ export function ProductCard({ p }: { p: Product }) {
       </Link>
       <div className="min-w-0 p-3.75 max-[601px]:p-3">
         <Link href={href} className="block min-w-0">
-          <h3 className="mb-2 line-clamp-2 break-words text-[15px] font-semibold">{p.name}</h3>
+          <h3 className="mb-2 line-clamp-2 wrap-break-word text-[15px] font-semibold">{p.name}</h3>
         </Link>
         <div className="flex items-center gap-1 text-[13px] text-[#f59e0b]">
           <Star size={14} fill="currentColor" aria-hidden="true" />

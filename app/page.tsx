@@ -21,7 +21,7 @@ export default async function Home() {
     <>
       <StoreHeader />
       <main>
-        <section className="mx-auto mt-8 grid w-[calc(100%_-_32px)] max-w-[79.375rem] grid-cols-[1fr_1fr] overflow-hidden rounded-[8px] bg-white max-[901px]:grid-cols-1">
+        <section className="mx-auto mt-8 grid w-[calc(100%-32px)] max-w-317.5 grid-cols-[1fr_1fr] overflow-hidden rounded-[8px] bg-white max-[901px]:grid-cols-1">
           <div className="p-16.25 max-[901px]:px-6 max-[901px]:py-10">
             <p className="kicker">The new Falcon collection</p>
             <h1 className="my-4.5 text-[clamp(45px,5vw,74px)] leading-[1.04] tracking-[-3px] max-[601px]:tracking-[-1.5px]">
@@ -29,9 +29,9 @@ export default async function Home() {
               <br />
               <em className="font-normal text-(--teal)">Better chosen</em>
             </h1>
-            <p className="mb-7 max-w-[380px] leading-[1.7] text-(--muted)">
-              Experience a new platform for discovering useful, beautiful things made for modern
-              life.
+            <p className="mb-7 max-w-95 leading-[1.7] text-(--muted)">
+              Experience a new platform for discovering useful, beautiful things
+              made for modern life.
             </p>
             <Button asChild>
               <Link href="/products">
@@ -39,7 +39,7 @@ export default async function Home() {
               </Link>
             </Button>
           </div>
-          <div className="min-h-[430px] max-[901px]:min-h-[260px]">
+          <div className="`min-h-107.5 max-[901px]:min-h-65">
             <Image
               className="h-full w-full object-cover"
               src="https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=1200&q=85"
@@ -51,19 +51,24 @@ export default async function Home() {
             />
           </div>
         </section>
-        <section className="mx-auto my-17.5 w-[calc(100%_-_32px)] max-w-[79.375rem]">
+        <section className="mx-auto my-17.5 w-[calc(100%-32px)] max-w-317.5">
           <div className="mb-6 flex items-end justify-between">
             <div>
               <p className="kicker">Popular now</p>
-              <h2 className="mt-2 text-[30px] max-[601px]:text-[24px]">Made for your everyday</h2>
+              <h2 className="mt-2 text-[30px] max-[601px]:text-[24px]">
+                Made for your everyday
+              </h2>
             </div>
-            <Link href="/products" className="flex items-center text-[13px] text-(--teal)!">
+            <Link
+              href="/products"
+              className="flex items-center text-[13px] text-(--teal)"
+            >
               View all <ChevronRight size={16} />
             </Link>
           </div>
           <ProductGrid items={featured.items} />
         </section>
-        <section className="mx-auto my-22.5 grid min-h-[330px] w-[calc(100%_-_32px)] max-w-[79.375rem] grid-cols-[1fr_1fr] overflow-hidden rounded-lg bg-(--navy) text-white max-[901px]:grid-cols-1 max-[601px]:my-12.5">
+        <section className="mx-auto my-22.5 grid min-h-82.5 w-[calc(100%-32px)] max-w-317.5 grid-cols-[1fr_1fr] overflow-hidden rounded-lg bg-(--navy) text-white max-[901px]:grid-cols-1 max-[601px]:my-12.5">
           <div className="p-15 max-[901px]:px-6 max-[901px]:py-10">
             <p className="kicker">Thoughtfully selected</p>
             <h2 className="mt-3.75 mb-6.25 text-[44px] leading-[1.05] max-[601px]:text-[32px]">
