@@ -6,6 +6,22 @@ A Next.js App Router storefront built for the *Task 2 — E-Commerce Product Sea
 
 **Stack:** Next.js 16 (App Router, Turbopack) · React 19 · TypeScript (strict) · Tailwind CSS 4 · Zustand 5 · React Hook Form 7 · Zod 4
 
+## Requirements coverage
+
+| Assignment requirement | Where it is handled |
+| --- | --- |
+| 500+ products from a JSON dataset or mock API | `data/products.json` (48 seeds) expanded to 520 products in `services/product.service.ts`, also served at `/api/products` |
+| Search, category, price, rating, sorting, pagination | `getProducts()` in the service, with controls in `ProductBrowser` |
+| URL-based filters that survive a refresh | `lib/product-query.ts` and `ProductBrowser` (see [URL-based filters](#url-based-filters)) |
+| Product details with images, stock, reviews, related products | `app/products/[slug]/page.tsx`, `getRelatedProducts()` |
+| Cart with add, remove, quantity and persistence | `store/cart.store.ts` (Zustand + `persist`), `lib/cart.ts`, `CartView` |
+| Checkout with React Hook Form and Zod | `CheckoutView`, `schemas/checkout.schema.ts`, `app/checkout/actions.ts` |
+| SEO-friendly product pages | Per-product metadata, canonical URLs, JSON-LD, sitemap (see [SEO](#seo)) |
+| Loading, empty and error states | See [Error, loading and empty states](#error-loading-and-empty-states) |
+| API service layer kept out of components | `services/` and the `app/api/products` route handlers |
+| Server and Client Components | See [Server vs Client Components](#server-vs-client-components) |
+| `useEffect`, `useMemo`, `useCallback`, `React.memo` only where justified | See [Performance decisions](#performance-decisions) |
+
 ## Setup
 
 Requires Node.js 20.9+.
@@ -51,6 +67,7 @@ components/
   checkout/                  CheckoutView (React Hook Form + Zod)
   layout/                    StoreHeader (server) + header-islands (search, cart badge, mobile menu), StoreFooter
   ui/                        shadcn-style primitives (Button, Input, Select, Pagination, ...)
+  styles/                    globals.css (Tailwind entry) and variables.css (design tokens)
 services/
   product.service.ts         Catalog, filtering → sorting → pagination, details, related products
   order.service.ts           Re-prices and stock-checks a cart against the catalog
@@ -61,7 +78,9 @@ lib/
   site.ts, utils.ts
 schemas/checkout.schema.ts   Zod schemas: delivery form and order lines
 store/cart.store.ts          Zustand store with the persist middleware
+types/product.ts             Product, review, query and result types
 data/products.json           48 hand-written seed products
+public/assets/               Product and hero images
 ```
 
 UI components never import the dataset. Everything goes through `services/`, and the pure logic in `lib/` and `schemas/` has no React dependency.
@@ -99,7 +118,8 @@ UI components never import the dataset. Everything goes through `services/`, and
 The URL is the single source of truth for search, category, price, rating, sort and page. That gives refresh persistence, shareable links, and browser back/forward support.
 
 - Selects (category, sort, rating) push a new history entry immediately.
-- Text fields (search, minimum and maximum price) keep a local draft and commit **together** after 350 ms with `router.replace`. Committing them together means quick edits to two fields can't overwrite each other from a stale URL, and typing doesn't add a history entry per keystroke. Drafts re-sync from the URL only when it changes from outside (back/forward, header search, Clear). Invalid prices show an inline error and aren't committed.
+- Text fields (search, minimum and maximum price) keep a local draft and commit **together** after 350 ms with `router.replace`. Committing them together means quick edits to two fields can't overwrite each other from a stale URL, and typing doesn't add a history entry per keystroke. Drafts re-sync from the URL only when it changes from outside (back/forward, header search, Clear); this happens during render, not in an effect. Invalid prices show an inline error and aren't committed.
+- A select change also carries any text draft that hasn't been committed yet, so changing the category while a search is still debouncing doesn't drop the search.
 - Every filter change removes `page`; every other active parameter is kept.
 - Pagination items are real `<a href>` links, so they work for crawlers, middle-click and no-JS. Plain clicks run inside `startTransition` so the skeleton grid shows while the next page loads.
 - Filtered listing URLs are `noindex, follow` and canonicalize to `/products` (or `/products?page=N`).
@@ -108,7 +128,7 @@ The URL is the single source of truth for search, category, price, rating, sort 
 
 | Server Components | Client Components (and why) |
 | --- | --- |
-| All pages and layouts, `StoreHeader`, `StoreFooter`, `ProductCard`, `ProductGrid`, `OrderTotals`, `RatingStars`, product details | `ProductBrowser` (URL-driven filter controls), `AddToCartButton` and `ProductActions` (cart writes), header islands (search form, cart badge, mobile menu), `CartView` and `CheckoutView` (localStorage-backed cart), `CartSync`, `error.tsx` |
+| All pages and layouts, `StoreHeader`, `StoreFooter`, `ProductCard`, `ProductGrid`, `OrderTotals`, `RatingStars`, product details | `ProductBrowser` (URL-driven filter controls), `AddToCartButton` and `ProductActions` (cart writes), header islands (search form, cart badge, mobile menu), `CartView` and `CheckoutView` (localStorage-backed cart), `CartSync`, `error.tsx` (must be a Client Component in Next.js), and the Radix-based `ui/select` and `ui/tooltip` |
 
 - Product cards stay on the server, and only the cart button is a client island.
 - The listing's result grid is rendered on the server and passed into `ProductBrowser` as `children`, so card markup and images don't add to client JavaScript.
@@ -154,7 +174,8 @@ The URL is the single source of truth for search, category, price, rating, sort 
 - **Small client islands** (header, card button, filters) instead of whole client pages.
 - **`useTransition`** for filter and page navigation, so the current UI stays interactive while a skeleton replaces the results.
 - **Debounced text filters** (350 ms) with timer cleanup.
-- **`React.memo` only where it has an effect** (cart lines). `useCallback` is used only where identity matters: the debounced commit callback is an effect dependency.
+- **`React.memo` only where it has an effect** (cart lines).
+- **`useCallback` only where identity matters**, all in `ProductBrowser`: `go` and `commitText` are in the debounce effect's dependency list, so a new function on every render would restart the 350 ms timer; `setDraft` is returned from the `useDebouncedFilters` hook, so it keeps the same identity the way a `useState` setter does. Other handlers are plain functions because nothing depends on their identity.
 - **No `useMemo` for cart totals.** The calculation is a single pass over a handful of items; memoizing would cost more than it saves.
 - **Lookups and caching.** `Map` lookups in the service, plus React `cache()` to dedupe the detail lookup between metadata and the page.
 - **Images.** `next/image` with `sizes`; the hero and product image are preloaded (`preload`, which replaces the deprecated `priority` in Next 16).
@@ -168,6 +189,8 @@ The URL is the single source of truth for search, category, price, rating, sort 
 - Route errors: `app/error.tsx` with `retry()`; in Next.js 16 this re-fetches the segment.
 
 ## Testing
+
+The repository has no automated test suite; `npm run lint` and `npm run typecheck` are the static checks.
 
 - The main shopping flow was checked in headless Chromium against a production build: filters and URL sync, back/forward, refresh, redirects, 404s, JSON-LD and canonical, cart limits and persistence, corrupted storage, checkout validation, double submit, stale-price rejection, no horizontal overflow at 375/820/1280 px, and no console or hydration errors.
 
