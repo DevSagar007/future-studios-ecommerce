@@ -13,6 +13,7 @@ export function AddToCartButton({ product }: { product: CartProduct }) {
     <Button
       type="button"
       variant="ghost"
+      className="grid size-[34px] place-items-center rounded-full bg-[#e6fffa] text-[#008e78]"
       size="icon"
       aria-label={soldOut ? `${product.name} is out of stock` : `Add ${product.name} to cart`}
       disabled={soldOut}

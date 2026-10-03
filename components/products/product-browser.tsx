@@ -52,20 +52,14 @@ const isValidPrice = (value: string) => value === "" || PRICE_PATTERN.test(value
 
 function SkeletonGrid() {
   return (
-    <div className="products-grid" aria-hidden="true">
+    <div className="grid grid-cols-[repeat(4,1fr)] gap-4.5 max-[1081px]:grid-cols-3 max-[601px]:grid-cols-2 max-[601px]:gap-3" aria-hidden="true">
       {Array.from({ length: SKELETON_COUNT }, (_, i) => (
-        <Skeleton className="skeleton" key={i} />
+        <Skeleton
+          className="aspect-square animate-[shine_1.2s_infinite] bg-transparent bg-[linear-gradient(90deg,#e2e8f0,#f8fafc,#e2e8f0)] bg-[length:200%]"
+          key={i}
+        />
       ))}
     </div>
-  );
-}
-
-export function ProductBrowserSkeleton() {
-  return (
-    <main className="shop-page" aria-busy="true">
-      <p className="sr-only" role="status">Loading products…</p>
-      <SkeletonGrid />
-    </main>
   );
 }
 
@@ -194,18 +188,18 @@ export function ProductBrowser({
   const hasFilters = searchParams.toString() !== "";
 
   return (
-    <main className="shop-page">
+    <main className="mx-auto my-17.5 w-[calc(100%_-_32px)] max-w-[79.375rem]">
       <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Shop" }]} />
-      <div className="shop-heading">
+      <div className="mb-8.75 flex items-end justify-between">
         <div>
-          <h1>
-            Find your <em>everyday</em>
+          <h1 className="my-4.5 text-[clamp(45px,5vw,74px)] leading-[1.04] tracking-[-3px] max-[601px]:tracking-[-1.5px]">
+            Find your <em className="font-normal text-(--teal)">everyday</em>
           </h1>
         </div>
       </div>
 
-      <div className="shop-toolbar">
-        <div className="search-box h-10 rounded-md border border-[var(--line)] bg-white px-3">
+      <div className="mb-6.5 flex justify-between border-y border-(--line) py-3 max-[601px]:flex-col max-[601px]:gap-2.5">
+        <div className="flex h-10 w-90 items-center gap-2 rounded-md border border-[var(--line)] bg-white px-3 max-[601px]:w-full">
           <Search size={18} className="shrink-0 text-(--muted)" aria-hidden="true" />
           <Input
             type="search"
@@ -231,17 +225,20 @@ export function ProductBrowser({
         </Select>
       </div>
 
-      <div className="shop-layout">
-        <aside className="filters" aria-label="Product filters">
-          <div className="filter-title">
-            <b>
+      <div className="grid grid-cols-[190px_1fr] gap-8.75 max-[901px]:grid-cols-1 max-[901px]:gap-5">
+        <aside
+          className="h-max rounded-[5px] bg-white p-4.5 max-[901px]:grid max-[901px]:grid-cols-2 max-[901px]:gap-x-4"
+          aria-label="Product filters"
+        >
+          <div className="flex justify-between border-b border-(--line) pb-3.5 text-[13px] max-[901px]:col-span-full">
+            <b className="flex items-center gap-1.5">
               <SlidersHorizontal size={16} aria-hidden="true" /> Filters
             </b>
-            <Button type="button" variant="link" onClick={() => go("/products")} disabled={!hasFilters}>
+            <Button className="text-[11px]!" type="button" variant="link" onClick={() => go("/products")} disabled={!hasFilters}>
               Clear
             </Button>
           </div>
-          <label>
+          <label className="mt-5.5 block text-[12px] text-[#475569]">
             Category
             <Select value={category} onValueChange={(value) => setFilter("category", value === "all" ? "" : value)}>
               <SelectTrigger className="mt-1.75">
@@ -272,11 +269,11 @@ export function ProductBrowser({
             placeholder="৳100000"
           />
           {swapped && (
-            <p className="mt-2 text-xs leading-5 text-amber-700" role="status">
+            <p className="mt-2 text-xs leading-5 text-amber-700 max-[901px]:col-span-full" role="status">
               Minimum was above maximum, so showing {taka(minPrice)}–{taka(maxPrice)}.
             </p>
           )}
-          <label>
+          <label className="mt-5.5 block text-[12px] text-[#475569]">
             Rating
             <Select value={ratingValue} onValueChange={(value) => setFilter("rating", value === "any" ? "" : value)}>
               <SelectTrigger className="mt-1.75">
@@ -294,7 +291,7 @@ export function ProductBrowser({
         </aside>
 
         <section className="results" aria-label="Products" aria-busy={isPending}>
-          <div className="results-meta" role="status">
+          <div className="mb-3.75 flex justify-between text-[13px] text-(--muted)" role="status">
             <span>
               {result.total} {result.total === 1 ? "product" : "products"}
             </span>
@@ -371,9 +368,10 @@ function PriceInput({
 }) {
   const invalid = !isValidPrice(value);
   return (
-    <label htmlFor={id}>
+    <label htmlFor={id} className="mt-5.5 block text-[12px] text-[#475569]">
       {label}
       <Input
+        className="mt-1.75"
         id={id}
         type="number"
         inputMode="decimal"

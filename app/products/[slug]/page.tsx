@@ -114,9 +114,9 @@ export default async function Page({ params }: { params: Params }) {
             <h1 className="my-3 break-words text-[2.375rem] leading-tight -tracking-px max-[600px]:text-[1.75rem]">
               {product.name}
             </h1>
-            <div className="rating">
+            <div className="flex items-center gap-1 text-[13px] text-[#f59e0b]">
               <RatingStars rating={product.rating} className="text-base" />
-              <small>
+              <small className="text-[11px] text-(--muted)">
                 {product.rating} out of 5 · <a href="#reviews" className="underline-offset-2 hover:underline">{reviewLabel(reviewCount)}</a>
               </small>
             </div>

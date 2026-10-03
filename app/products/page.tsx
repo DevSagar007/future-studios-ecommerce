@@ -54,7 +54,7 @@ export default async function Page({ searchParams }: { searchParams: SearchParam
         {items.length > 0 ? (
           <ProductGrid items={items} />
         ) : (
-          <div className="empty">
+          <div className="rounded-[7px] bg-white px-5 py-20 text-center">
             <h2>No products found</h2>
             <p>Try a different search, widen the price range or clear the filters.</p>
           </div>

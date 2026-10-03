@@ -8,7 +8,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "primary-button",
+        // `!` keeps these ahead of the unlayered `a`/`button` resets in globals.css.
+        default: "rounded-[5px] border-0 bg-(--teal) px-5 py-3 text-[16px]! font-medium! text-white! hover:bg-[#009c80]",
         outline: "border border-(--line) bg-white text-[var(--text)] hover:bg-[#f8fafc]",
         ghost: "bg-transparent",
         link: "text-[var(--teal)] underline-offset-4 hover:underline",

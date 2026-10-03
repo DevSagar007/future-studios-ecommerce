@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -53,43 +52,9 @@ function PaginationLink({
   );
 }
 
-function PaginationPrevious({ className, ...props }: PaginationLinkProps) {
-  return (
-    <PaginationLink aria-label="Go to previous page" className={cn("h-9 w-9 rounded-md px-0", className)} {...props}>
-      <ChevronLeft size={16} />
-      <span>Previous</span>
-    </PaginationLink>
-  );
-}
-
-function PaginationNext({ className, ...props }: PaginationLinkProps) {
-  return (
-    <PaginationLink aria-label="Go to next page" className={cn("h-9 w-9 rounded-md px-0", className)} {...props}>
-      <span>Next</span>
-      <ChevronRight size={16} />
-    </PaginationLink>
-  );
-}
-
-function PaginationEllipsis({ className, ...props }: React.ComponentProps<"span">) {
-  return (
-    <span
-      aria-hidden
-      data-slot="pagination-ellipsis"
-      className={cn("flex h-9 w-9 items-center justify-center text-(--muted)", className)}
-      {...props}
-    >
-      <MoreHorizontal size={16} />
-    </span>
-  );
-}
-
 export {
   Pagination,
   PaginationContent,
   PaginationItem,
   PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationEllipsis,
 };

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { CartSync } from "@/components/cart/cart-sync";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "@/components/styles/globals.css";
-import "@/components/styles/button-overrides.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

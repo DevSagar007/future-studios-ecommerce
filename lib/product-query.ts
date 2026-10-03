@@ -1,7 +1,6 @@
 import type { ProductQuery, SortOption } from "@/types/product";
 
 export const SORT_OPTIONS = ["featured", "price-low", "price-high", "rating"] as const satisfies readonly SortOption[];
-export const RATING_OPTIONS = ["4", "4.5"] as const;
 export const DEFAULT_LIMIT = 12;
 export const MAX_LIMIT = 48;
 const MAX_SEARCH_LENGTH = 100;
