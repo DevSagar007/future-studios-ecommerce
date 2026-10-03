@@ -1,182 +1,191 @@
-# Ecommerce Task
+# Falcon — E-commerce Product Search & Checkout
 
-Falcon-inspired ecommerce storefront built with Next.js App Router and TypeScript.
+A Next.js App Router storefront built for the *Task 2 — E-Commerce Product Search & Checkout* frontend assignment. It covers browsing and filtering a 520-product catalog, product detail pages, a persistent cart, and a validated mock checkout.
 
-## Features
+**Live demo:** https://future-studios-ecommerce.vercel.app/
 
-- Responsive Falcon-style storefront, navigation, footer and promotional sections
-- 520 deterministic local products
-- Product API with search, category, price, rating, sorting and pagination
-- URL-driven listing: search, filters, sort and page all live in query params and survive refresh
-- Full pagination with page windowing and previous/next controls
-- Product detail pages with SEO metadata, reviews, stock, related products and 404 handling
-- Persistent Zustand cart with quantity controls and live totals
-- React Hook Form + Zod validated checkout
-- Loading skeletons, empty/error/not-found states and responsive layouts
-- Reusable shadcn-style UI primitives with Tailwind CSS
+**Stack:** Next.js 16 (App Router, Turbopack) · React 19 · TypeScript (strict) · Tailwind CSS 4 · Zustand 5 · React Hook Form 7 · Zod 4 · Vitest
 
-## Tech stack
+## Setup
 
-- **Next.js 16** — App Router, Server/Client Components, Turbopack
-- **TypeScript 5** — strict mode
-- **Tailwind CSS 4** — utility-first CSS with custom design tokens
-- **Zustand 5** — persistent cart state management
-- **React Hook Form 7** — form state management
-- **Zod 4** — schema validation
-- **Lucide React** — icon library
-- **shadcn/ui style** — Radix UI primitives with custom styling
-
-## Run locally
+Requires Node.js 20.9+.
 
 ```bash
 npm install
-npm run dev
+npm run dev        # http://localhost:3000
 ```
 
-Visit http://localhost:3000.
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Development server |
+| `npm run build` / `npm start` | Production build (prerenders all 520 product pages) / serve it |
+| `npm run lint` | ESLint (Next.js core-web-vitals + TypeScript rules) |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm test` | Vitest unit tests: query parsing, filtering and pagination, cart rules, totals, checkout validation |
 
-## API
+### Environment variables
 
-### `GET /api/products`
+None are required. One is optional:
 
-Query parameters:
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | Absolute origin for canonical URLs, the sitemap and JSON-LD, for example `https://future-studios-ecommerce.vercel.app`. On Vercel, the project's production domain (`VERCEL_PROJECT_PRODUCTION_URL`) is used automatically. Locally it falls back to `http://localhost:3000`. |
 
-| Parameter  | Type   | Description                          | Example            |
-|------------|--------|--------------------------------------|--------------------|
-| `search`   | string | Full-text search across name, category, description | `?search=laptop` |
-| `category` | string | Filter by exact category name        | `?category=Audio`  |
-| `minPrice` | number | Minimum price filter                 | `?minPrice=1000`   |
-| `maxPrice` | number | Maximum price filter                 | `?maxPrice=50000`  |
-| `rating`   | number | Minimum rating filter                | `?rating=4.5`      |
-| `sort`     | string | Sort order: `price-low`, `price-high`, `rating` | `?sort=price-low` |
-| `page`     | number | Page number (default: 1)             | `?page=2`          |
-| `limit`    | number | Items per page (default: 12, max: 48)| `?limit=24`        |
-
-Example: `GET /api/products?search=laptop&category=Electronics&sort=price-low&page=1&limit=12`
-
-Response:
-```json
-{
-  "items": [...],
-  "total": 520,
-  "page": 1,
-  "limit": 12,
-  "totalPages": 44,
-  "categories": ["Audio", "Electronics", "Lifestyle", "Accessories", ...]
-}
-```
-
-### `GET /api/products/[id]`
-
-Returns a single product by `id` or `slug`. Returns 404 for unknown ids.
-
-## Structure
+## Architecture
 
 ```
-app/                    — App Router pages, error/not-found boundaries and API routes
-  layout.tsx            — Root layout with global metadata
-  page.tsx              — Home page with hero, featured products
-  products/page.tsx     — Server-rendered product listing
-  products/[id]/page.tsx— Product detail with reviews, related products
-  cart/page.tsx         — Cart page
-  checkout/page.tsx     — Checkout with React Hook Form + Zod
-  api/products/route.ts — Products listing API
-  api/products/[id]/route.ts — Product detail API
-  not-found.tsx         — 404 boundary
-  error.tsx             — Error boundary
-
+app/
+  layout.tsx                 Root layout: metadataBase, global styles, <CartSync/>
+  page.tsx                   Home (Server Component, static)
+  products/page.tsx          Listing: parses searchParams, queries the service, redirects bad ?page
+  products/[slug]/page.tsx   Product details: SSG for all 520 slugs, canonical, Product JSON-LD
+  products/[slug]/not-found.tsx
+  cart/page.tsx              Server shell around the client cart (noindex)
+  checkout/page.tsx          Server shell around the client checkout form (noindex)
+  checkout/actions.ts        Server Action: simulated order with server-side validation
+  api/products/...           Mock REST API: list, detail, related (same service as the pages)
+  sitemap.ts, robots.ts, error.tsx, not-found.tsx
 components/
-  layout/               — StoreHeader, StoreFooter (client components for interactivity)
-  products/             — ProductCard, ProductGrid, ProductActions, ProductBrowser
-  cart/                 — CartView
-  ui/                   — Button, Input, Select, Pagination, Breadcrumb, Tooltip, Badge, Skeleton
-  styles/               — globals.css, variables.css, button-overrides.css
-
-data/products.json      — Seed catalog expanded deterministically to 520 products
-services/               — Product querying and related-product logic
-store/                  — Persistent Zustand cart
-schemas/                — Zod checkout schema
-lib/                    — Formatting and shared cart helpers
-types/                  — TypeScript type definitions
+  products/                  ProductCard (server) + AddToCartButton (client island),
+                             ProductBrowser (client filters/pagination), ProductActions, RatingStars
+  cart/                      CartView, CartSync (hydration + cross-tab sync), OrderTotals
+  checkout/                  CheckoutView (React Hook Form + Zod)
+  layout/                    StoreHeader (server) + header-islands (search, cart badge, mobile menu), StoreFooter
+  ui/                        shadcn-style primitives (Button, Input, Select, Pagination, ...)
+services/
+  product.service.ts         Catalog, filtering → sorting → pagination, details, related products
+  order.service.ts           Re-prices and stock-checks a cart against the catalog
+lib/
+  product-query.ts           Parses and normalizes URL query params (shared by pages and API)
+  cart.ts                    Pure cart operations and persisted-data sanitizing
+  pricing.ts                 Cart totals, shipping fee, discount calculation
+  site.ts, utils.ts
+schemas/checkout.schema.ts   Zod schemas: delivery form and order lines
+store/cart.store.ts          Zustand store with the persist middleware
+data/products.json           48 hand-written seed products
+tests/                       Vitest unit tests
 ```
 
-## Server and client components
+UI components never import the dataset. Everything goes through `services/`, and the pure logic in `lib/` and `schemas/` is unit-tested without React.
 
-Home, product listing, product detail and API routes use server-side data access. Interactive filters, cart controls, navigation and checkout use client components only where browser state is required.
+## Data and API
 
-The listing is server-rendered: `app/products/page.tsx` reads `searchParams`, queries the service, and passes the page of results to the client `ProductBrowser`. The browser only pushes new query strings through the Next router — it never fetches the API itself, so there is no duplicate request on mount or hydration.
+- **Dataset.** `data/products.json` holds 48 seed products. `product.service.ts` expands them deterministically into 520 products ("Edition N" variants) with varied prices and stock.
+  - Each old price keeps its seed's discount ratio, so `originalPrice` is never below the current price.
+  - Written reviews stay on the original product only; editions are not given copies of another product's reviews.
+- **Service layer.** `getProducts(query)` filters (search, category, price range, rating), then sorts, then paginates.
+  - Sorting always falls back to product id to break ties, so the order is deterministic.
+  - `getProductById` looks up by id or slug through a `Map` and is wrapped in React `cache()`, so `generateMetadata` and the page share one lookup per request.
+  - `getRelatedProducts` returns the best-rated products in the same category and excludes other editions of the same product.
+- **How pages get data.** Server Components call the service directly. There is no client-side fetching and no double fetch on hydration, and the browser only receives the 12 products on the current page.
+- **Mock REST API** (uses the same parser and service):
+  - `GET /api/products?search=&category=&minPrice=&maxPrice=&rating=&sort=&page=&limit=` returns `{ items, total, page, limit, totalPages, categories, query }`, where `query` is the normalized query that was actually applied.
+  - `GET /api/products/:idOrSlug` returns the product, or 404.
+  - `GET /api/products/:idOrSlug/related` returns `{ items }`, or 404.
 
-## Zustand cart architecture
+### Query parameter rules (`lib/product-query.ts`)
 
-The cart uses Zustand 5 with the `persist` middleware, storing state in `localStorage` under the key `ecommerce-task-cart`. The store provides:
+| Input | Behaviour |
+| --- | --- |
+| `minPrice` / `maxPrice` negative, non-numeric, `1e3` | Ignored |
+| `minPrice` > `maxPrice` | Swapped; the UI explains which range is shown |
+| `sort` not one of `featured`, `price-low`, `price-high`, `rating` | Uses `featured` |
+| `rating` | Clamped to 0–5 |
+| `category` | Matched case-insensitively; unknown categories are ignored |
+| `page` malformed or out of range | The listing **redirects** to the page actually shown (`?page=999` → last page) |
+| `limit` (API only) | Clamped to 1–48 |
+| `search` | Trimmed, at most 100 characters |
 
-- `add(product, quantity)` — adds a product or increases quantity (capped at stock)
-- `remove(id)` — removes an item
-- `inc(id)` — increases quantity by 1 (capped at stock)
-- `dec(id)` — decreases quantity by 1 (minimum 1)
-- `clear()` — empties the cart
+## URL-based filters
 
-Components use targeted selectors (`useCartStore((s) => s.items)`) so re-renders only happen when the relevant slice changes.
+The URL is the single source of truth for search, category, price, rating, sort and page. That gives refresh persistence, shareable links, and browser back/forward support.
 
-## React Hook Form and Zod validation
+- Selects (category, sort, rating) push a new history entry immediately.
+- Text fields (search, minimum and maximum price) keep a local draft and commit **together** after 350 ms with `router.replace`. Committing them together means quick edits to two fields can't overwrite each other from a stale URL, and typing doesn't add a history entry per keystroke. Drafts re-sync from the URL only when it changes from outside (back/forward, header search, Clear). Invalid prices show an inline error and aren't committed.
+- Every filter change removes `page`; every other active parameter is kept.
+- Pagination items are real `<a href>` links, so they work for crawlers, middle-click and no-JS. Plain clicks run inside `startTransition` so the skeleton grid shows while the next page loads.
+- Filtered listing URLs are `noindex, follow` and canonicalize to `/products` (or `/products?page=N`).
 
-The checkout form uses React Hook Form with the Zod resolver. The schema (`schemas/checkout.schema.ts`) validates:
+## Server vs Client Components
 
-- `fullName` — minimum 2 characters
-- `email` — valid email format
-- `phone` — minimum 7 characters
-- `address` — minimum 5 characters
-- `city` — minimum 2 characters
-- `postalCode` — minimum 3 characters
+| Server Components | Client Components (and why) |
+| --- | --- |
+| All pages and layouts, `StoreHeader`, `StoreFooter`, `ProductCard`, `ProductGrid`, `OrderTotals`, `RatingStars`, product details | `ProductBrowser` (URL-driven filter controls), `AddToCartButton` and `ProductActions` (cart writes), header islands (search form, cart badge, mobile menu), `CartView` and `CheckoutView` (localStorage-backed cart), `CartSync`, `error.tsx` |
 
-Error messages are displayed via `role="alert"` for screen reader accessibility.
+- Product cards stay on the server, and only the cart button is a client island.
+- The listing's result grid is rendered on the server and passed into `ProductBrowser` as `children`, so card markup and images don't add to client JavaScript.
+- Rendering:
+  - Product pages are statically generated (`generateStaticParams`). Unknown slugs return a real 404, and legacy `/products/prod-001` URLs return a 308 redirect to the slug.
+  - `/`, `/cart` and `/checkout` are static.
+  - `/products` is rendered per request because it depends on `searchParams`.
 
-## Data-fetching approach
+## Cart state and persistence
 
-Product data is accessed through `services/product.service.ts`. Components never read the dataset directly. The service layer handles:
+- Zustand store with `persist` in localStorage (key `ecommerce-task-cart`, version 2).
+- **Hydration.** `skipHydration: true`, then `CartSync` calls `rehydrate()` in an effect after mount. The first client render therefore matches the server HTML (no hydration mismatch). A `hydrated` flag lets the cart and checkout show a skeleton instead of briefly flashing "empty cart". `CartSync` also listens for `storage` events to keep tabs in sync, and removes the listener on cleanup.
+- **Stored shape.** Only the fields the cart needs (`id, slug, name, image, category, price, stock, quantity`); descriptions and reviews are not persisted.
+- **Invalid or outdated data.** `migrate` and `merge` pass stored items through `sanitizeCartItems`, which drops malformed or duplicate entries and re-clamps quantities to 1…stock. Unparseable JSON results in an empty cart.
+- **Rules.** Adding the same product again increases its quantity. Quantity is always between 1 and stock. Out-of-stock products can't be added.
+- **Selectors.** The header badge selects a number, not the items array. Cart lines are wrapped in `React.memo`: store actions are stable and unchanged items keep their identity, so changing one quantity re-renders only that line.
 
-- Full-text search (name, category, description)
-- Category filtering
-- Price range filtering
-- Rating filtering
-- Sorting (price low/high, rating)
-- Pagination with configurable limit (default 12, max 48)
+## Checkout
 
-Invalid query values are normalized: page and limit are clamped, non-numeric values are ignored, and the detail endpoint returns 404 for unknown ids.
+- React Hook Form with `zodResolver(checkoutSchema)`, validating on blur and then on change. The schema targets Bangladesh, matching the ৳ prices and Dhaka address:
+  - Text fields are trimmed, so whitespace-only input counts as missing; length limits apply.
+  - Email must be valid.
+  - Phone must be a BD mobile number (`01XXXXXXXXX`, optional `+880`, spaces and dashes allowed).
+  - Postal code must be 4 digits.
+- Accessibility: every input has a `<label>`, the right `type`, `autocomplete` and `inputMode`, plus `aria-invalid`. Errors are linked with `aria-describedby`, and the first invalid field gets focus.
+- **Simulated order.** The `placeOrder` Server Action re-validates the form and order lines on the server, then calls `checkOrder`, which re-prices every line from the catalog and checks stock.
+  - If the persisted cart is outdated (price changed, stock reduced, product gone), the order is rejected, the cart is updated from the returned catalog data, and the user reviews it before resubmitting.
+  - Nothing is stored, charged or sent anywhere. The confirmation shows a `DEMO-XXXXXXXX` reference.
+- The submit button is disabled while submitting, and `handleSubmit` ignores re-entry, so a double click places one order.
+- The cart is cleared **only after** a successful response. On a network error the cart is kept and an error is shown.
+- **Shipping.** This is a demo store, so the shipping fee is ৳0 (`SHIPPING_FEE` in `lib/pricing.ts`). Cart, checkout and the server check all use the same `cartTotals()`, so subtotal + shipping = total everywhere, and the summary says that no fee, payment or real order is involved.
 
-## Responsive strategy
+## SEO
 
-The app is responsive from 280px to 1440px+ using Tailwind CSS breakpoint prefixes:
-
-- **Mobile (280px–800px)**: Single-column layouts, stacked filters, hamburger menu, full-width cards
-- **Tablet (801px–1079px)**: 2-column product grid, side-by-side product detail
-- **Desktop (1080px+)**: 3-4 column grid, sidebar filters, full navigation
-
-Key responsive breakpoints: `max-[800px]`, `min-[601px]`, `min-[801px]`, `min-[1080px]`, `min-[1200px]`, `min-[1280px]`
+- Per-product `title`, `description`, Open Graph image, and a canonical URL resolved against `metadataBase`.
+- `Product` JSON-LD (escaped as the Next.js docs recommend). It contains name, description, image, SKU, category, and an offer with BDT price and availability; the written reviews are included only when a product has them. It intentionally has **no** `aggregateRating` or `brand`, because the catalog has no review counts or brand data to back them.
+- `sitemap.xml` (home, listing, 520 products) and `robots.txt` (disallows cart, checkout and the API).
+- Cart and checkout are `noindex`. The product 404 and the generic 404 are separate pages.
 
 ## Performance decisions
 
-- **Server-rendered listing data.** The dataset query runs on the server; the client receives one page of items. No client-side fetch, no duplicate mount request, and no unnecessary payload.
-- **URL as the single source of truth.** Filters, sort and page are read from `useSearchParams` and written with `useTransition`, so navigation stays responsive and state survives refresh without duplicated React state.
-- **Debounced free-text inputs.** Search and price fields debounce URL updates (~350ms) instead of firing a request per keystroke.
-- **Minimal client bundle.** Only components that need interactivity (`StoreHeader`, `ProductCard`, `ProductBrowser`, `ProductActions`, `CartView`, checkout) are client components; layout, footer, grid and detail pages stay on the server.
-- **Targeted Zustand selectors** (`useCartStore((s) => s.items)`) so cart components re-render only when their slice changes.
-- **`useMemo`/`useCallback`/`React.memo` are intentionally avoided** where there is no measured need; they are used only where a stable identity matters (the debounce commit callback).
-- **Cleanup** of timers (`ProductActions`) prevents state updates after unmount.
+- **Server-first.** Filtering and pagination run on the server; the client gets one page of results.
+- **Small client islands** (header, card button, filters) instead of whole client pages.
+- **`useTransition`** for filter and page navigation, so the current UI stays interactive while a skeleton replaces the results.
+- **Debounced text filters** (350 ms) with timer cleanup.
+- **`React.memo` only where it has an effect** (cart lines). `useCallback` is used only where identity matters: the debounced commit callback is an effect dependency.
+- **No `useMemo` for cart totals.** The calculation is a single pass over a handful of items; memoizing would cost more than it saves.
+- **Lookups and caching.** `Map` lookups in the service, plus React `cache()` to dedupe the detail lookup between metadata and the page.
+- **Images.** `next/image` with `sizes`; the hero and product image are preloaded (`preload`, which replaces the deprecated `priority` in Next 16).
+- **Effects** are used only for side effects: cart rehydration and the `storage` listener, the Escape-key listener for the mobile menu, the "Added" timer cleanup, and error logging.
 
-## Deployment
+## Error, loading and empty states
 
-The app builds with `npm run build` and runs with `npm start`.
+- Listing: a skeleton grid during transitions, an empty state with guidance when nothing matches, and redirects for bad page numbers.
+- Product: an SSG page, `not-found.tsx` with a real 404 for invalid ids, and an out-of-stock state.
+- Cart and checkout: a hydration skeleton, an empty-cart state, and inline and server errors.
+- Route errors: `app/error.tsx` with `retry()`; in Next.js 16 this re-fetches the segment.
 
-Deploy to Vercel:
+## Testing
 
-1. Push the repository to GitHub.
-2. Import it at vercel.com/new (framework preset: Next.js).
-3. No environment variables are required.
+- `npm test` runs 61 unit tests in `tests/` covering:
+  - query parsing edge cases;
+  - filter-before-paginate, deterministic sorting and page clamping;
+  - data validity (no invalid old prices, no duplicated reviews);
+  - related products;
+  - cart merge, stock caps and sanitizing;
+  - catalog sync and totals;
+  - checkout schema and server-side order checks.
+- The main shopping flow was also checked in headless Chromium against a production build: filters and URL sync, back/forward, refresh, redirects, 404s, JSON-LD and canonical, cart limits and persistence, corrupted storage, checkout validation, double submit, stale-price rejection, no horizontal overflow at 375/820/1280 px, and no console or hydration errors.
 
-## Verification
+## Known limitations
 
-```bash
-npm run lint    # ESLint passes
-npm run build   # Production build succeeds
-```
+- Each product has one image; the seed data has no gallery images.
+- Product ratings are catalog values. Most products have no written reviews, so the page shows "Rated X out of 5 · N written reviews" and never presents an invented review count.
+- Edition products are generated variants of the 48 seeds, so names and images repeat with different prices and stock.
+- Stock is not reserved; the order check uses the static catalog.
+- Checkout is simulated: no payments, accounts, order history or order tracking. The header's Track Order, Help Center and Sell With Us items are kept from the original design and link to the product listing; footer information pages are listed as plain text.
+- Footer contact details and payment logos come from the original design and are placeholders.

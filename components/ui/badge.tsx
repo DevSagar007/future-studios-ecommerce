@@ -7,7 +7,7 @@ const badgeVariants = cva("inline-flex items-center justify-center font-semibold
     variant: {
       default: "bg-[var(--teal)] text-white",
       muted: "bg-[#fee2e2] text-[#ef4444]",
-      outline: "border border-[var(--line)] text-[var(--text)]",
+      outline: "border border-(--line) text-[var(--text)]",
     },
   },
   defaultVariants: {

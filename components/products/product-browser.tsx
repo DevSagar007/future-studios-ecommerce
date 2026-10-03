@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition, type MouseEvent, type ReactNode } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, Search, SlidersHorizontal } from "lucide-react";
-import type { Product } from "@/types/product";
-import { ProductGrid } from "@/components/products/product-grid";
+import { productsHref } from "@/lib/product-query";
+import { taka } from "@/lib/utils";
+import type { ProductListResult } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
@@ -23,18 +25,12 @@ import {
   PaginationLink,
 } from "@/components/ui/pagination";
 
-export type ProductBrowserResult = {
-  items: Product[];
-  total: number;
-  totalPages: number;
-  page: number;
-  categories: string[];
-};
+export type ProductBrowserResult = Omit<ProductListResult, "items">;
 
 const SKELETON_COUNT = 8;
+const DEBOUNCE_MS = 350;
 
 const SORT_LABELS: Record<string, string> = {
-  "": "Sort by: Featured",
   featured: "Sort by: Featured",
   "price-low": "Price: low to high",
   "price-high": "Price: high to low",
@@ -42,20 +38,33 @@ const SORT_LABELS: Record<string, string> = {
 };
 
 const RATING_LABELS: Record<string, string> = {
-  "": "Any rating",
   any: "Any rating",
   "4": "4+ stars",
   "4.5": "4.5+ stars",
 };
 
+const TEXT_KEYS = ["search", "minPrice", "maxPrice"] as const;
+type TextKey = (typeof TEXT_KEYS)[number];
+type Drafts = Record<TextKey, string>;
+
+const PRICE_PATTERN = /^\d+(\.\d+)?$/;
+const isValidPrice = (value: string) => value === "" || PRICE_PATTERN.test(value.trim());
+
+function SkeletonGrid() {
+  return (
+    <div className="products-grid" aria-hidden="true">
+      {Array.from({ length: SKELETON_COUNT }, (_, i) => (
+        <Skeleton className="skeleton" key={i} />
+      ))}
+    </div>
+  );
+}
+
 export function ProductBrowserSkeleton() {
   return (
     <main className="shop-page" aria-busy="true">
-      <div className="products-grid">
-        {Array.from({ length: SKELETON_COUNT }, (_, i) => (
-          <Skeleton className="skeleton" key={i} />
-        ))}
-      </div>
+      <p className="sr-only" role="status">Loading products…</p>
+      <SkeletonGrid />
     </main>
   );
 }
@@ -71,98 +80,122 @@ function paginationItems(current: number, total: number) {
   return pages;
 }
 
-function useDebouncedParam(
-  key: string,
-  commit: (key: string, value: string) => void,
-  delay = 350,
-) {
-  const searchParams = useSearchParams();
-  const urlValue = searchParams.get(key) ?? "";
-  const [value, setValue] = useState(urlValue);
-  const lastPushed = useRef(urlValue);
+const readDrafts = (params: URLSearchParams): Drafts => ({
+  search: params.get("search") ?? "",
+  minPrice: params.get("minPrice") ?? "",
+  maxPrice: params.get("maxPrice") ?? "",
+});
 
-  useEffect(() => {
-    const next = searchParams.get(key) ?? "";
-    if (next !== lastPushed.current) {
-      lastPushed.current = next;
-      setValue(next);
-    }
-  }, [searchParams, key]);
+const keyOf = (drafts: Drafts) => TEXT_KEYS.map((key) => drafts[key]).join("\u0000");
 
-  useEffect(() => {
-    const current = searchParams.get(key) ?? "";
-    if (value === current) return;
-    const timer = setTimeout(() => {
-      lastPushed.current = value;
-      commit(key, value);
-    }, delay);
-    return () => clearTimeout(timer);
-  }, [value, searchParams, key, commit, delay]);
-
-  return [value, setValue] as const;
+/** Invalid price drafts are not pushed; the URL keeps its current value for that field. */
+function committable(drafts: Drafts, url: Drafts): Drafts {
+  return {
+    search: drafts.search,
+    minPrice: isValidPrice(drafts.minPrice) ? drafts.minPrice.trim() : url.minPrice,
+    maxPrice: isValidPrice(drafts.maxPrice) ? drafts.maxPrice.trim() : url.maxPrice,
+  };
 }
 
-export function ProductBrowser({ result }: { result: ProductBrowserResult }) {
+/**
+ * Local drafts for the free-text filters, committed to the URL together after a pause.
+ * Committing all three at once means quick edits to search, min and max can't overwrite
+ * each other from a stale URL snapshot. Drafts re-sync from the URL only when it changes
+ * from outside this hook (back/forward, header search, "Clear").
+ */
+function useDebouncedFilters(commit: (changes: Drafts) => void) {
+  const searchParams = useSearchParams();
+  const urlDrafts = readDrafts(searchParams);
+  const urlKey = keyOf(urlDrafts);
+
+  const [drafts, setDrafts] = useState(urlDrafts);
+  const [seenUrlKey, setSeenUrlKey] = useState(urlKey);
+  const [committedKey, setCommittedKey] = useState<string | null>(null);
+
+  if (urlKey !== seenUrlKey) {
+    setSeenUrlKey(urlKey);
+    if (urlKey !== committedKey) {
+      setDrafts(urlDrafts);
+      setCommittedKey(null);
+    }
+  }
+
+  const next = committable(drafts, urlDrafts);
+  const nextKey = keyOf(next);
+
+  useEffect(() => {
+    if (nextKey === urlKey || nextKey === committedKey) return;
+    const timer = setTimeout(() => {
+      setCommittedKey(nextKey);
+      commit(next);
+    }, DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+    // `next` is fully described by nextKey.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nextKey, urlKey, committedKey, commit]);
+
+  const setDraft = useCallback((key: TextKey, value: string) => {
+    setDrafts((current) => ({ ...current, [key]: value }));
+  }, []);
+
+  return [drafts, setDraft, next] as const;
+}
+
+const isModifiedClick = (event: MouseEvent) =>
+  event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0;
+
+export function ProductBrowser({
+  result,
+  children,
+}: {
+  result: ProductBrowserResult;
+  /** Server-rendered results (grid or empty state) for the current URL. */
+  children: ReactNode;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const commitParam = useCallback(
-    (key: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (value) params.set(key, value);
-      else params.delete(key);
-      params.delete("page");
-      const query = params.toString();
+  const go = useCallback(
+    (href: string, mode: "push" | "replace" = "push") => {
       startTransition(() => {
-        router.replace(query ? `/products?${query}` : "/products", { scroll: false });
+        router[mode](href, { scroll: false });
       });
     },
-    [router, searchParams],
+    [router],
   );
 
-  const [search, setSearch] = useDebouncedParam("search", commitParam);
-  const [minPrice, setMinPrice] = useDebouncedParam("minPrice", commitParam);
-  const [maxPrice, setMaxPrice] = useDebouncedParam("maxPrice", commitParam);
+  // Text filters replace history entries so typing doesn't create one entry per pause.
+  const commitText = useCallback(
+    (values: Drafts) => go(productsHref(searchParams, { ...values, page: null }), "replace"),
+    [go, searchParams],
+  );
+  const [drafts, setDraft, pendingText] = useDebouncedFilters(commitText);
 
-  const navigate = (mutate: (params: URLSearchParams) => void) => {
-    const params = new URLSearchParams(searchParams.toString());
-    mutate(params);
-    const query = params.toString();
-    startTransition(() => {
-      router.push(query ? `/products?${query}` : "/products", { scroll: false });
-    });
+  // Carry pending text drafts so a select change can't drop a not-yet-committed search.
+  const setFilter = (key: string, value: string) =>
+    go(productsHref(searchParams, { ...pendingText, [key]: value, page: null }));
+  const pageHref = (page: number) => productsHref(searchParams, { page: page > 1 ? String(page) : null });
+  const onPageClick = (event: MouseEvent<HTMLAnchorElement>, page: number) => {
+    if (isModifiedClick(event)) return;
+    event.preventDefault();
+    startTransition(() => router.push(pageHref(page)));
   };
 
-  const setFilter = (key: string, value: string) => {
-    navigate((params) => {
-      if (value) params.set(key, value);
-      else params.delete(key);
-      params.delete("page");
-    });
-  };
-
-  const goToPage = (page: number) => {
-    navigate((params) => {
-      if (page > 1) params.set("page", String(page));
-      else params.delete("page");
-    });
-  };
-
-  const clearFilters = () => {
-    startTransition(() => {
-      router.push("/products", { scroll: false });
-    });
-  };
-
-  const pages = paginationItems(result.page, result.totalPages);
-  const sort = searchParams.get("sort") ?? "";
-  const category = searchParams.get("category") ?? "all";
+  const sort = result.query.sort;
+  const category = result.query.category ?? "all";
   const rating = searchParams.get("rating") ?? "";
+  const ratingValue = rating in RATING_LABELS ? rating : "any";
+  const pages = paginationItems(result.page, result.totalPages);
+  const { minPrice, maxPrice } = result.query;
+  const rawMin = Number(searchParams.get("minPrice"));
+  const rawMax = Number(searchParams.get("maxPrice"));
+  const swapped = minPrice !== undefined && maxPrice !== undefined && rawMin > rawMax;
+  const hasFilters = searchParams.toString() !== "";
 
   return (
     <main className="shop-page">
-      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "My Shop" }]} />
+      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Shop" }]} />
       <div className="shop-heading">
         <div>
           <h1>
@@ -175,45 +208,42 @@ export function ProductBrowser({ result }: { result: ProductBrowserResult }) {
         <div className="search-box h-10 rounded-md border border-[var(--line)] bg-white px-3">
           <Search size={18} className="shrink-0 text-(--muted)" aria-hidden="true" />
           <Input
+            type="search"
             className="h-9 min-w-0 border-0 bg-transparent px-0 shadow-none focus:border-transparent focus:ring-0"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={drafts.search}
+            onChange={(e) => setDraft("search", e.target.value)}
             placeholder="Search products..."
             aria-label="Search products"
+            maxLength={100}
           />
         </div>
-        <Select
-          value={sort || "featured"}
-          onValueChange={(value) => setFilter("sort", value === "featured" ? "" : value)}
-        >
+        <Select value={sort} onValueChange={(value) => setFilter("sort", value === "featured" ? "" : value)}>
           <SelectTrigger aria-label="Sort products">
-            <SelectValue>{SORT_LABELS[sort] ?? SORT_LABELS[""]}</SelectValue>
+            <SelectValue>{SORT_LABELS[sort]}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="featured">Sort by: Featured</SelectItem>
-            <SelectItem value="price-low">Price: low to high</SelectItem>
-            <SelectItem value="price-high">Price: high to low</SelectItem>
-            <SelectItem value="rating">Top rated</SelectItem>
+            {Object.entries(SORT_LABELS).map(([value, label]) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
 
       <div className="shop-layout">
-        <aside className="filters">
+        <aside className="filters" aria-label="Product filters">
           <div className="filter-title">
             <b>
               <SlidersHorizontal size={16} aria-hidden="true" /> Filters
             </b>
-            <Button type="button" variant="link" onClick={clearFilters}>
+            <Button type="button" variant="link" onClick={() => go("/products")} disabled={!hasFilters}>
               Clear
             </Button>
           </div>
           <label>
             Category
-            <Select
-              value={category}
-              onValueChange={(value) => setFilter("category", value === "all" ? "" : value)}
-            >
+            <Select value={category} onValueChange={(value) => setFilter("category", value === "all" ? "" : value)}>
               <SelectTrigger className="mt-1.75">
                 <SelectValue>{category === "all" ? "All categories" : category}</SelectValue>
               </SelectTrigger>
@@ -227,110 +257,95 @@ export function ProductBrowser({ result }: { result: ProductBrowserResult }) {
               </SelectContent>
             </Select>
           </label>
-          <label>
-            Minimum price
-            <Input
-              type="number"
-              min={0}
-              value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
-              placeholder="৳0"
-            />
-          </label>
-          <label>
-            Maximum price
-            <Input
-              type="number"
-              min={0}
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
-              placeholder="৳100000"
-            />
-          </label>
+          <PriceInput
+            label="Minimum price"
+            id="min-price"
+            value={drafts.minPrice}
+            onChange={(value) => setDraft("minPrice", value)}
+            placeholder="৳0"
+          />
+          <PriceInput
+            label="Maximum price"
+            id="max-price"
+            value={drafts.maxPrice}
+            onChange={(value) => setDraft("maxPrice", value)}
+            placeholder="৳100000"
+          />
+          {swapped && (
+            <p className="mt-2 text-xs leading-5 text-amber-700" role="status">
+              Minimum was above maximum, so showing {taka(minPrice)}–{taka(maxPrice)}.
+            </p>
+          )}
           <label>
             Rating
-            <Select
-              value={rating || "any"}
-              onValueChange={(value) => setFilter("rating", value === "any" ? "" : value)}
-            >
+            <Select value={ratingValue} onValueChange={(value) => setFilter("rating", value === "any" ? "" : value)}>
               <SelectTrigger className="mt-1.75">
-                <SelectValue>{RATING_LABELS[rating] ?? RATING_LABELS[""]}</SelectValue>
+                <SelectValue>{RATING_LABELS[ratingValue]}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="any">Any rating</SelectItem>
-                <SelectItem value="4">4+ stars</SelectItem>
-                <SelectItem value="4.5">4.5+ stars</SelectItem>
+                {Object.entries(RATING_LABELS).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </label>
         </aside>
 
-        <section className="results">
-          <div className="results-meta">
-            {result.total} products{" "}
+        <section className="results" aria-label="Products" aria-busy={isPending}>
+          <div className="results-meta" role="status">
             <span>
-              Page {result.page} of {result.totalPages}
+              {result.total} {result.total === 1 ? "product" : "products"}
             </span>
+            {result.total > 0 && (
+              <span>
+                Page {result.page} of {result.totalPages}
+              </span>
+            )}
           </div>
 
-          {isPending ? (
-            <div className="products-grid" aria-busy="true">
-              {Array.from({ length: SKELETON_COUNT }, (_, i) => (
-                <Skeleton className="skeleton" key={i} />
-              ))}
-            </div>
-          ) : result.items.length > 0 ? (
-            <ProductGrid items={result.items} />
-          ) : (
-            <div className="empty">
-              <h2>No products found</h2>
-              <p>Try adjusting your search or filters.</p>
-            </div>
-          )}
+          {isPending ? <SkeletonGrid /> : children}
 
           {result.totalPages > 1 && (
             <Pagination aria-label="Pagination">
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationLink asChild aria-label="Previous page">
-                    <button
-                      type="button"
-                      onClick={() => goToPage(result.page - 1)}
-                      disabled={result.page <= 1}
-                    >
-                      <ChevronLeft size={16} />
-                    </button>
-                  </PaginationLink>
+                  <PageArrow
+                    direction="previous"
+                    page={result.page - 1}
+                    disabled={result.page <= 1}
+                    href={pageHref(result.page - 1)}
+                    onClick={onPageClick}
+                  />
                 </PaginationItem>
                 {pages.map((item, index) =>
                   item === "gap" ? (
-                    <PaginationItem key={`gap-${index}`}>
+                    <PaginationItem key={`gap-${index}`} aria-hidden="true">
                       <span className="flex w-7.5 items-center justify-center text-(--muted)">…</span>
                     </PaginationItem>
                   ) : (
                     <PaginationItem key={item}>
-                      <PaginationLink
-                        asChild
-                        isActive={item === result.page}
-                        className={item === result.page ? "active" : ""}
-                      >
-                        <button type="button" onClick={() => goToPage(item)}>
+                      <PaginationLink asChild isActive={item === result.page}>
+                        <Link
+                          href={pageHref(item)}
+                          onClick={(event) => onPageClick(event, item)}
+                          aria-label={`Page ${item}`}
+                        >
                           {item}
-                        </button>
+                        </Link>
                       </PaginationLink>
                     </PaginationItem>
                   ),
                 )}
                 <PaginationItem>
-                  <PaginationLink asChild aria-label="Next page">
-                    <button
-                      type="button"
-                      onClick={() => goToPage(result.page + 1)}
-                      disabled={result.page >= result.totalPages}
-                    >
-                      <ChevronRight size={16} />
-                    </button>
-                  </PaginationLink>
+                  <PageArrow
+                    direction="next"
+                    page={result.page + 1}
+                    disabled={result.page >= result.totalPages}
+                    href={pageHref(result.page + 1)}
+                    onClick={onPageClick}
+                  />
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
@@ -338,5 +353,75 @@ export function ProductBrowser({ result }: { result: ProductBrowserResult }) {
         </section>
       </div>
     </main>
+  );
+}
+
+function PriceInput({
+  label,
+  id,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  id: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+}) {
+  const invalid = !isValidPrice(value);
+  return (
+    <label htmlFor={id}>
+      {label}
+      <Input
+        id={id}
+        type="number"
+        inputMode="decimal"
+        min={0}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        aria-invalid={invalid || undefined}
+        aria-describedby={invalid ? `${id}-error` : undefined}
+      />
+      {invalid && (
+        <small id={`${id}-error`} className="mt-1 block text-red-600">
+          Enter a positive amount.
+        </small>
+      )}
+    </label>
+  );
+}
+
+function PageArrow({
+  direction,
+  page,
+  disabled,
+  href,
+  onClick,
+}: {
+  direction: "previous" | "next";
+  page: number;
+  disabled: boolean;
+  href: string;
+  onClick: (event: MouseEvent<HTMLAnchorElement>, page: number) => void;
+}) {
+  const Icon = direction === "previous" ? ChevronLeft : ChevronRight;
+  const label = direction === "previous" ? "Previous page" : "Next page";
+  if (disabled) {
+    return (
+      <PaginationLink asChild>
+        <span aria-disabled="true" aria-label={label} className="pointer-events-none opacity-40">
+          <Icon size={16} aria-hidden="true" />
+        </span>
+      </PaginationLink>
+    );
+  }
+  return (
+    <PaginationLink asChild>
+      <Link href={href} onClick={(event) => onClick(event, page)} aria-label={label} rel={direction === "previous" ? "prev" : "next"}>
+        <Icon size={16} aria-hidden="true" />
+      </Link>
+    </PaginationLink>
   );
 }

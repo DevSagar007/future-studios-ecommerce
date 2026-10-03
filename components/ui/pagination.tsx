@@ -47,7 +47,7 @@ function PaginationLink({
     <Comp
       data-slot="pagination-link"
       aria-current={isActive ? "page" : undefined}
-      className={cn(buttonVariants({ variant: isActive ? "outline" : "ghost", size: "icon" }), "inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-[var(--line)] bg-white px-2 text-sm hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40", isActive && "active border-[var(--teal)] bg-[var(--teal)] text-white hover:bg-[#009c80]", className)}
+      className={cn(buttonVariants({ variant: isActive ? "outline" : "ghost", size: "icon" }), "inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-(--line) bg-white px-2 text-sm hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40", isActive && "active border-[var(--teal)] bg-[var(--teal)] text-white hover:bg-[#009c80]", className)}
       {...props}
     />
   );

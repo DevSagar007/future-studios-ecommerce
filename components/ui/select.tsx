@@ -21,7 +21,7 @@ function SelectTrigger({
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
-      className={cn("inline-flex h-10 w-full items-center justify-between gap-2 rounded border border-[var(--line)] bg-white px-2.25 text-sm text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--teal)]", className)}
+      className={cn("inline-flex h-10 w-full items-center justify-between gap-2 rounded border border-(--line) bg-white px-2.25 text-sm text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--teal)]", className)}
       {...props}
     >
       {children}
@@ -43,7 +43,7 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         position={position}
-        className={cn("z-[60] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded border border-[var(--line)] bg-white shadow-[0_10px_30px_rgba(15,23,42,.12)]", className)}
+        className={cn("z-[60] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded border border-(--line) bg-white shadow-[0_10px_30px_rgba(15,23,42,.12)]", className)}
         {...props}
       >
         <SelectPrimitive.Viewport className="p-1">

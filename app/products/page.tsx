@@ -1,54 +1,65 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getProducts } from "@/services/product.service";
-import {
-  ProductBrowser,
-  ProductBrowserSkeleton,
-} from "@/components/products/product-browser";
+import { redirect } from "next/navigation";
+import { getProducts, resolveCategory } from "@/services/product.service";
+import { parseProductQuery, productsHref, type RawSearchParams } from "@/lib/product-query";
+import { ProductBrowser } from "@/components/products/product-browser";
+import { ProductGrid } from "@/components/products/product-grid";
 import { StoreHeader } from "@/components/layout/store-header";
 import { StoreFooter } from "@/components/layout/store-footer";
 
-export const metadata: Metadata = {
-  title: "Shop all products",
-  description:
-    "Browse 500+ products across electronics, audio, lifestyle and accessories. Search, filter and sort the full Falcon collection.",
-};
-
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-function first(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] : value;
+const FILTER_KEYS = ["search", "category", "minPrice", "maxPrice", "rating", "sort"];
+
+function toURLSearchParams(params: RawSearchParams) {
+  const result = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    const first = Array.isArray(value) ? value[0] : value;
+    if (first !== undefined) result.set(key, first);
+  }
+  return result;
+}
+
+export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
+  const params = await searchParams;
+  const query = parseProductQuery(params);
+  const category = resolveCategory(query.category);
+  const filtered = FILTER_KEYS.some((key) => params[key] !== undefined);
+  return {
+    title: category ? `Shop ${category}` : "Shop all products",
+    description:
+      "Browse 500+ products across electronics, audio, lifestyle and accessories. Search, filter and sort the full Falcon collection.",
+    alternates: { canonical: query.page && query.page > 1 ? `/products?page=${query.page}` : "/products" },
+    // Filter combinations are near-duplicates of the main listing; keep them out of the index.
+    robots: filtered ? { index: false, follow: true } : undefined,
+  };
 }
 
 export default async function Page({ searchParams }: { searchParams: SearchParams }) {
-  const params = await searchParams;
-  const pick = (key: string) => {
-    const value = first(params[key]);
-    return value && value.length > 0 ? value : undefined;
-  };
-  const toNumber = (key: string) => {
-    const value = pick(key);
-    if (!value) return undefined;
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : undefined;
-  };
+  const raw = await searchParams;
+  const result = await getProducts(parseProductQuery(raw));
 
-  const result = await getProducts({
-    search: pick("search"),
-    category: pick("category"),
-    sort: pick("sort"),
-    page: toNumber("page") ?? 1,
-    minPrice: toNumber("minPrice"),
-    maxPrice: toNumber("maxPrice"),
-    rating: toNumber("rating"),
-  });
+  // Malformed (?page=abc, ?page=-2) or out-of-range (?page=999) pages redirect to the page actually shown.
+  const rawPage = toURLSearchParams(raw).get("page");
+  if (rawPage !== null && rawPage !== String(result.page)) {
+    redirect(productsHref(toURLSearchParams(raw), { page: result.page > 1 ? String(result.page) : null }));
+  }
+
+  const { items, ...meta } = result;
 
   return (
     <>
       <StoreHeader />
-      <Suspense fallback={<ProductBrowserSkeleton />}>
-        <ProductBrowser result={result} />
-      </Suspense>
+      <ProductBrowser result={meta}>
+        {items.length > 0 ? (
+          <ProductGrid items={items} />
+        ) : (
+          <div className="empty">
+            <h2>No products found</h2>
+            <p>Try a different search, widen the price range or clear the filters.</p>
+          </div>
+        )}
+      </ProductBrowser>
       <StoreFooter />
     </>
   );

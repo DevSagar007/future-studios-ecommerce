@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: "Everyday things, better chosen",
   description:
     "Discover useful, beautiful products at fair prices. Shop 500+ items across electronics, audio, lifestyle and accessories.",
+  alternates: { canonical: "/" },
 };
 
 export default async function Home() {
@@ -44,7 +45,7 @@ export default async function Home() {
               alt="Curated desk setup"
               width={1200}
               height={900}
-              priority
+              preload
               sizes="(max-width: 800px) 100vw, 50vw"
             />
           </div>

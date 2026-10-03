@@ -40,3 +40,24 @@
 
 
 
+
+/* Responsive layout: the base rules above are desktop-only. */
+@media (max-width:1080px){.products-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){
+  .shop-layout{grid-template-columns:minmax(0,1fr);gap:20px}
+  .filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px}
+  .filters>.filter-title,.filters>p{grid-column:1/-1}
+  .home-hero,.feature-banner{grid-template-columns:minmax(0,1fr)}
+  .home-hero>div:first-child,.feature-banner>div{padding:40px 24px}
+  .hero-image{min-height:260px}
+}
+@media (max-width:600px){
+  .products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .product-card-body{padding:12px}
+  .shop-toolbar{flex-direction:column;gap:10px}
+  .search-box{width:100%}
+  .shop-heading h1,.home-hero h1{letter-spacing:-1.5px}
+  .section-heading h2{font-size:24px}
+  .feature-banner{margin:50px auto}
+  .feature-banner h2{font-size:32px}
+}

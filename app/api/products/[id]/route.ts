@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { getProductById } from "@/services/product.service";
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(_request: Request, { params }: RouteContext<"/api/products/[id]">) {
   const { id } = await params;
   const product = await getProductById(id);
   if (!product) {
